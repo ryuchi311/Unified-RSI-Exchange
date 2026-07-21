@@ -1,0 +1,131 @@
+.alert-feed {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.92), rgba(15, 23, 42, 0.98));
+  border-radius: 16px;
+  border: 1px solid rgba(51, 65, 85, 0.95);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.2);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.9);
+}
+
+.feed-header h2 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #cbd5e1;
+}
+
+.alert-count {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.feed-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.no-alerts {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #64748b;
+  text-align: center;
+  padding: 20px;
+}
+
+.no-alerts p {
+  font-size: 12px;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.alert-item {
+  padding: 12px 14px;
+  border-left: 3px solid;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.75);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(15, 23, 42, 0.7);
+}
+
+.alert-item:hover {
+  background: rgba(30, 41, 59, 0.95);
+}
+
+.alert-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+
+.exchange {
+  font-weight: 600;
+  color: #10b981;
+}
+
+.symbol {
+  font-weight: 500;
+  color: #f8fafc;
+}
+
+.time {
+  color: #64748b;
+  margin-left: auto;
+}
+
+.alert-details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+
+.alert-type {
+  font-weight: 500;
+  color: #fbbf24;
+}
+
+.price {
+  color: #cbd5e1;
+}
+
+.rsi-values {
+  display: flex;
+  gap: 12px;
+  font-size: 10px;
+  color: #64748b;
+}
+
+@media (max-width: 760px) {
+  .feed-header {
+    padding: 12px;
+  }
+
+  .alert-item {
+    padding: 10px 12px;
+  }
+}
+
+.rsi-5m,
+.rsi-15m {
+  font-family: 'Courier New', monospace;
+}

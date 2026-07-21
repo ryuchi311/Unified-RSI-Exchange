@@ -1,0 +1,120 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+  height: 60px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #10b981, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+}
+
+.exchange-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tab {
+  padding: 6px 14px;
+  background: #334155;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tab:hover {
+  background: #475569;
+}
+
+.tab.active {
+  background: #10b981;
+  color: #0f172a;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 4px 8px;
+  background: #334155;
+  border-radius: 4px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.dot.connected {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.dot.disconnected {
+  background: #ef4444;
+}
+
+.btn {
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.btn:hover {
+  background: #475569;
+}
+
+.btn-primary {
+  background: #10b981;
+  color: #0f172a;
+}
+
+.btn-primary:hover {
+  background: #059669;
+}
+
+.btn-primary.scanning {
+  background: #ef4444;
+}
+
+.btn-primary.scanning:hover {
+  background: #dc2626;
+}
+
+.btn-secondary {
+  background: #475569;
+}
+
+.btn-secondary:hover {
+  background: #64748b;
+}
