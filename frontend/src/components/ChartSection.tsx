@@ -1,47 +1,77 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useDashboardStore } from '../hooks/useDashboardStore.js';
+import { AdvancedRealTimeChart } from 'react-ts-tradingview-widgets';
+
+const TV_PREFIX: Record<string, string> = {
+  BingX: 'BINGX',
+  LBank: 'LBANK',
+  Bitunix: 'BITUNIX',
+};
+
+const INTERVAL_MAP: Record<string, string> = {
+  '5M': '5',
+  '15M': '15',
+  '4H': '240',
+};
+
+const EXCHANGE_STYLE: Record<string, { label: string; color: string; bg: string }> = {
+  BingX:   { label: 'BingX',   color: 'text-cyan-400',    bg: 'bg-cyan-500/10 ring-cyan-500/30' },
+  LBank:   { label: 'LBank',   color: 'text-amber-400',   bg: 'bg-amber-500/10 ring-amber-500/30' },
+  Bitunix: { label: 'Bitunix', color: 'text-emerald-400', bg: 'bg-emerald-500/10 ring-emerald-500/30' },
+};
 
 export const ChartSection: React.FC = () => {
-  const { selectedSymbol, activeExchange } = useDashboardStore();
+  const { selectedSymbol, activeExchange, sortBy } = useDashboardStore();
+
+  const tvSymbol = useMemo(() => {
+    const symbol = (selectedSymbol || 'BTCUSDT').replace(/[-_]/g, '');
+    const prefix = TV_PREFIX[activeExchange] ?? 'BINANCE';
+    return `${prefix}:${symbol}`;
+  }, [selectedSymbol, activeExchange]);
+
+  const tvInterval = (INTERVAL_MAP[sortBy] ?? '15') as any;
+
+  const exStyle = EXCHANGE_STYLE[activeExchange] ?? EXCHANGE_STYLE['BingX'];
+  const displaySymbol = selectedSymbol || 'BTCUSDT';
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <div className="mb-2.5 flex items-center justify-between px-1 pt-1">
-        <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-200">{selectedSymbol}</h2>
-        <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] text-cyan-100">{activeExchange}</span>
-      </div>
-      <div className="flex flex-1 min-h-0 overflow-hidden rounded-3xl border border-cyan-400/10 bg-slate-950/55 shadow-[0_18px_55px_rgba(0,0,0,0.25)] backdrop-blur-xl">
-        <div className="flex h-full w-full flex-col items-center justify-center gap-2.5 bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.12),_transparent_40%),radial-gradient(circle_at_bottom_right,_rgba(99,102,241,0.10),_transparent_32%),_#0f172a] px-5 py-8 text-center">
-          <div className="max-w-2xl text-[11px] leading-5 text-slate-400">
-            {selectedSymbol} / TETHER PERPETUAL CONTRACT - 5 - Binance
+    <div className="flex h-full flex-col">
+      {/* Chart header bar */}
+      <div className="flex shrink-0 items-center justify-between border-b border-white/[0.06] px-4 py-2.5">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-violet-500/15">
+            <svg className="h-3.5 w-3.5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+            </svg>
           </div>
-          <svg viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet" className="h-full w-full max-h-[260px]">
-            {/* Placeholder candlestick pattern */}
-            <defs>
-              <linearGradient id="volumeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style={{ stopColor: '#10b981', stopOpacity: 0.3 }} />
-                <stop offset="100%" style={{ stopColor: '#10b981', stopOpacity: 0 }} />
-              </linearGradient>
-            </defs>
-            <text x="50%" y="50%" textAnchor="middle" dy="0.3em" fill="#a5b4fc" fontSize="20">
-              Chart visualization will appear here
-            </text>
-          </svg>
+          <span className="text-sm font-bold text-white">{displaySymbol}</span>
+          <span className="text-slate-600">/</span>
+          <span className="text-xs text-slate-500">USDT Perp</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {/* Interval badge */}
+          <span className="rounded-md bg-violet-500/10 px-2 py-0.5 text-[11px] font-semibold text-violet-400 ring-1 ring-violet-500/25">
+            {sortBy === '5M' ? '5m' : sortBy === '15M' ? '15m' : sortBy === '4H' ? '4h' : '15m'}
+          </span>
+          {/* Exchange badge */}
+          <span className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ring-1 ${exStyle.bg} ${exStyle.color}`}>
+            {exStyle.label}
+          </span>
         </div>
       </div>
-      <div className="mt-2.5 grid grid-cols-2 gap-2 lg:grid-cols-4">
-        <div className="flex items-center justify-center rounded-xl border border-cyan-400/15 bg-slate-900/70 px-3 py-1.5 text-[10px] text-slate-300">
-          Overbought
-        </div>
-        <div className="flex items-center justify-center rounded-xl border border-cyan-400/15 bg-slate-900/70 px-3 py-1.5 text-[10px] text-slate-300">
-          Extreme OB
-        </div>
-        <div className="flex items-center justify-center rounded-xl border border-cyan-400/15 bg-slate-900/70 px-3 py-1.5 text-[10px] text-slate-300">
-          Oversold
-        </div>
-        <div className="flex items-center justify-center rounded-xl border border-cyan-400/15 bg-slate-900/70 px-3 py-1.5 text-[10px] text-slate-300">
-          Extreme OS
-        </div>
+
+      {/* TradingView widget */}
+      <div className="flex-1 min-h-0">
+        <AdvancedRealTimeChart
+          symbol={tvSymbol}
+          interval={tvInterval}
+          theme="dark"
+          width="100%"
+          height="100%"
+          allow_symbol_change={false}
+          hide_side_toolbar={true}
+          enable_publishing={false}
+        />
       </div>
     </div>
   );

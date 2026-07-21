@@ -8,6 +8,10 @@ export interface DashboardState {
   selectedTimeframes: string[];
   isScanning: boolean;
   scanningExchanges: Set<Exchange>;
+  symbolSearch: string;
+  rsiZoneFilter: 'ALL' | 'OB' | 'XOB' | 'OS' | 'XOS';
+  sortBy: 'ZONE' | '5M' | '15M' | '4H' | 'SYMBOL';
+  sortDirection: 'asc' | 'desc';
 
   // Data
   alerts: Alert[];
@@ -24,6 +28,10 @@ export interface DashboardState {
   toggleScanning: (exchange: Exchange) => void;
   startAllScanning: () => void;
   stopAllScanning: () => void;
+  setSymbolSearch: (search: string) => void;
+  setRsiZoneFilter: (filter: 'ALL' | 'OB' | 'XOB' | 'OS' | 'XOS') => void;
+  setSortBy: (sort: 'ZONE' | '5M' | '15M' | '4H' | 'SYMBOL') => void;
+  toggleSortDirection: () => void;
   addAlert: (alert: Alert) => void;
   clearAlerts: () => void;
   setSelectedAlert: (alert: Alert | null) => void;
@@ -40,6 +48,10 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   selectedTimeframes: ['5m', '15m'],
   isScanning: false,
   scanningExchanges: new Set(),
+  symbolSearch: '',
+  rsiZoneFilter: 'ALL',
+  sortBy: 'ZONE',
+  sortDirection: 'desc',
   alerts: [],
   selectedAlert: null,
   selectedSymbol: 'BTCUSDT',
@@ -100,6 +112,22 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       isScanning: false,
     }),
 
+  setSymbolSearch: (search: string) => set({ symbolSearch: search }),
+
+  setRsiZoneFilter: (filter) => set({ rsiZoneFilter: filter }),
+
+  setSortBy: (sort) =>
+    set((state) => {
+      if (state.sortBy === sort) {
+        // Same sort column clicked — toggle direction
+        return { sortDirection: state.sortDirection === 'desc' ? 'asc' : 'desc' };
+      }
+      return { sortBy: sort, sortDirection: 'desc' };
+    }),
+
+  toggleSortDirection: () =>
+    set((state) => ({ sortDirection: state.sortDirection === 'desc' ? 'asc' : 'desc' })),
+
   addAlert: (alert: Alert) =>
     set((state) => {
       const alerts = [alert, ...state.alerts].slice(0, 100); // Keep last 100
@@ -117,9 +145,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   getFilteredAlerts: () => {
     const state = get();
     return state.alerts.filter((alert) => {
-      const exchangeMatch = alert.exchange === state.activeExchange;
       const filterMatch = state.selectedAlertFilters.includes(alert.alertType);
-      return exchangeMatch && filterMatch;
+      return filterMatch;
     });
   },
 }));
