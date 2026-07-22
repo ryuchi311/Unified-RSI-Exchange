@@ -12,6 +12,24 @@ export const Header: React.FC = () => {
     { name: 'Bitunix', dot: 'bg-emerald-400', ring: 'ring-emerald-500/30', text: 'text-emerald-300', bg: 'bg-emerald-500/10' },
   ];
 
+  const [status, setStatus] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch('http://localhost:5005/api/status/dashboard');
+        const data = await res.json();
+        if (!cancelled) setStatus(data.exchanges || []);
+      } catch (err) {
+        // ignore
+      }
+    };
+    fetchStatus();
+    const iv = setInterval(fetchStatus, 5000);
+    return () => { cancelled = true; clearInterval(iv); };
+  }, []);
+
   return (
     <header className="px-3 pt-4 pb-2 sm:px-4 sm:pt-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -37,15 +55,23 @@ export const Header: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2">
           {/* Exchange badges */}
           <div className="hidden items-center gap-1.5 sm:flex">
-            {exchanges.map((ex) => (
-              <span
-                key={ex.name}
-                className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${ex.bg} ${ex.text} ${ex.ring}`}
-              >
-                <span className={`h-1.5 w-1.5 animate-pulse rounded-full ${ex.dot}`} />
-                {ex.name}
-              </span>
-            ))}
+            {exchanges.map((ex) => {
+              const exStatus = status.find((s) => s.exchange === ex.name);
+              const isSyncing = exStatus?.scanning;
+              const text = isSyncing && exStatus?.total > 0 
+                ? `${ex.name} ${exStatus.scanned}/${exStatus.total}` 
+                : `${ex.name} ${exStatus?.symbols || 0} pairs`;
+                
+              return (
+                <span
+                  key={ex.name}
+                  className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${ex.bg} ${ex.text} ${ex.ring}`}
+                >
+                  <span className={`h-1.5 w-1.5 ${isSyncing ? 'animate-pulse' : ''} rounded-full ${ex.dot}`} />
+                  {text}
+                </span>
+              );
+            })}
           </div>
 
           {/* Divider */}

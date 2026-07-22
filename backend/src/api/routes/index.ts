@@ -49,7 +49,7 @@ export function registerAlertRoutes(
   app.get('/api/status/details/:exchange', (req, res) => {
     try {
       const exchange = req.params.exchange as Exchange;
-      const limit = parseInt(req.query.limit as string) || 50;
+      const limit = parseInt(req.query.limit as string) || 5000;
       const raw = restPoller?.getLatestScanData(exchange, limit) || [];
       // Normalize symbols to clean BTCUSDT format for the frontend
       const data = raw.map(item => ({ ...item, symbol: normalizeDisplay(item.symbol) }));
