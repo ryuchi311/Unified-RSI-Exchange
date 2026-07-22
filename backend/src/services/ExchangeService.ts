@@ -32,7 +32,7 @@ export abstract class ExchangeService {
    * @param intervals Intervals to subscribe to
    * @returns WebSocket URL or connection parameters
    */
-  abstract getWebSocketUrl(symbols: string[], intervals: string[]): string | null;
+  abstract getWebSocketUrl(symbols?: string[], intervals?: string[]): string | null;
 
   /**
    * Parse incoming WebSocket kline message

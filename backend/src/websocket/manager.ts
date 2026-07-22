@@ -1,8 +1,8 @@
 import WebSocket from 'ws';
 import type { Exchange, Candle, RSIValues } from '../types/shared.js';
-import { ExchangeService } from './ExchangeService.js';
+import { ExchangeService } from '../services/ExchangeService.js';
 import { calculateRSI } from '../utils/rsi.js';
-import { AlertDetector } from './AlertDetector.js';
+import { AlertDetector } from '../services/AlertDetector.js';
 import { logger } from '../utils/logger.js';
 
 interface KlineBuffer {

@@ -2,11 +2,12 @@ import express, { Express } from 'express';
 import { createServer, Server as HTTPServer } from 'http';
 import { WebSocketServer } from 'ws';
 import type { Exchange, Alert } from '../types/shared.js';
-import { registerAlertRoutes, registerKlineRoutes, registerHealthRoutes } from './routes/index.js';
+import { registerAlertRoutes, registerKlineRoutes, registerHealthRoutes, registerSettingsRoutes } from './routes/index.js';
 import { SymbolManager } from '../services/SymbolManager.js';
 import { WebSocketManager } from '../websocket/manager.js';
 import { AlertDetector } from '../services/AlertDetector.js';
 import { RestPoller } from '../services/RestPoller.js';
+import { SettingsManager } from '../services/SettingsManager.js';
 import { logger } from '../utils/logger.js';
 
 export class APIServer {
@@ -17,19 +18,22 @@ export class APIServer {
   private symbolManager: SymbolManager;
   private wsManager: WebSocketManager;
   private restPoller: RestPoller;
+  private settingsManager: SettingsManager;
   private alertClients: Set<any> = new Set();
 
   constructor(
     alertDetector: AlertDetector,
     symbolManager: SymbolManager,
     wsManager: WebSocketManager,
-    restPoller: RestPoller
+    restPoller: RestPoller,
+    settingsManager: SettingsManager
   ) {
     this.app = express();
     this.alertDetector = alertDetector;
     this.symbolManager = symbolManager;
     this.wsManager = wsManager;
     this.restPoller = restPoller;
+    this.settingsManager = settingsManager;
 
     this.httpServer = createServer(this.app) as unknown as HTTPServer;
     this.wsServer = new WebSocketServer({
@@ -60,6 +64,7 @@ export class APIServer {
 
   private setupRoutes(): void {
     registerHealthRoutes(this.app);
+    registerSettingsRoutes(this.app, this.settingsManager, this.restPoller);
     registerAlertRoutes(this.app, this.symbolManager, this.wsManager, this.restPoller);
     registerKlineRoutes(this.app, this.wsManager);
   }

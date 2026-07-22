@@ -1,8 +1,9 @@
 import type { Express } from 'express';
-import type { SymbolManager } from '../services/SymbolManager.js';
-import type { WebSocketManager } from '../websocket/manager.js';
-import type { RestPoller } from '../services/RestPoller.js';
-import type { Exchange } from '../types/shared.js';
+import type { SymbolManager } from '../../services/SymbolManager.js';
+import type { WebSocketManager } from '../../websocket/manager.js';
+import type { RestPoller } from '../../services/RestPoller.js';
+import type { Exchange } from '../../types/shared.js';
+import type { SettingsManager } from '../../services/SettingsManager.js';
 import { logger } from '../../utils/logger.js';
 
 // Normalize raw exchange symbol formats to clean BTCUSDT for frontend display
@@ -138,6 +139,35 @@ export function registerKlineRoutes(
       });
     } catch (error) {
       logger.error('Error fetching klines', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+}
+
+export function registerSettingsRoutes(app: Express, settingsManager: SettingsManager, restPoller: RestPoller): void {
+  app.get('/api/settings', (req, res) => {
+    try {
+      res.json(settingsManager.getSettings());
+    } catch (error) {
+      logger.error('Error fetching settings', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/settings', async (req, res) => {
+    try {
+      const oldSettings = settingsManager.getSettings();
+      await settingsManager.saveSettings(req.body);
+      const newSettings = settingsManager.getSettings();
+      
+      // If maxScanPairs changed, restart active scans immediately
+      if (oldSettings.maxScanPairs !== newSettings.maxScanPairs) {
+        restPoller.restartActiveScans();
+      }
+
+      res.json(newSettings);
+    } catch (error) {
+      logger.error('Error saving settings', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });

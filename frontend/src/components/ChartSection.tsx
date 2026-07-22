@@ -28,13 +28,13 @@ function buildTVSymbol(cleanSymbol: string, exchange: string): string {
 
   switch (exchange) {
     case 'BingX':
-      return `BINGX:${cleanSymbol}.P`;  // e.g. BINGX:ATOMUSDT.P
+      return `BINGX:${base}USDT.P`;
     case 'LBank':
-      return `LBANK:${base}_USDT.P`;
+      return `LBANK:${base}USDT.P`;
     case 'Bitunix':
-      return `BITUNIX:${cleanSymbol}.P`;
+      return `BITUNIX:${base}USDT.P`;
     default:
-      return `BINGX:${base}-USDT.P`;
+      return `BINGX:${base}USDT.P`;
   }
 }
 

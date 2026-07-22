@@ -18,11 +18,12 @@ export class BingXService extends ExchangeService {
         .filter((contract: any) =>
           contract.status === 1 &&              // 1 = actively trading
           typeof contract.symbol === 'string' &&
-          contract.symbol.endsWith('-USDT')     // Only USDT-margined perp pairs
+          contract.symbol.endsWith('-USDT') &&  // Only USDT-margined perp pairs
+          contract.contractType !== 'DELIVERY'  // Exclude delivery/futures, keep only perpetual swaps
         )
         .map((contract: any) => ({
-          // Store as raw BingX format e.g. "BTC-USDT" — kline will use this directly
-          symbol: contract.symbol as string,    // e.g. "BTC-USDT"
+          // Store as clean BTCUSDT format (no separator) for UI and logs
+          symbol: (contract.symbol as string).replace('-USDT', '') + 'USDT',
           exchange: 'BingX' as const,
           baseAsset: contract.asset || contract.symbol.replace('-USDT', ''),
           quoteAsset: 'USDT',
@@ -41,8 +42,8 @@ export class BingXService extends ExchangeService {
     try {
       await this.respectRateLimit();
 
-      // symbol is stored as "BTC-USDT" from fetchSymbols; use directly
-      const bingxSymbol = symbol.includes('-') ? symbol : `${symbol}-USDT`;
+      // Reconstruct BingX API format: BTCUSDT → BTC-USDT
+      const bingxSymbol = symbol.includes('-') ? symbol : `${symbol.replace(/USDT$/i, '')}-USDT`;
 
       const response = await axios.get(`${this.baseUrl}/openApi/swap/v2/quote/klines`, {
         params: {
@@ -81,7 +82,7 @@ export class BingXService extends ExchangeService {
       if (!data.data || !data.data.k) return null;
       const k = data.data.k;
       return {
-        symbol: data.data.s as string,
+        symbol: (data.data.s as string).replace('-USDT', '') + 'USDT',
         interval: data.data.i,
         candle: {
           timestamp: k.t,

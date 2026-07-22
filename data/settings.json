@@ -1,0 +1,9 @@
+{
+  "maxScanPairs": 300,
+  "tier1Overbought": 80,
+  "tier1Oversold": 20,
+  "tier2Overbought": 90,
+  "tier2Oversold": 10,
+  "telegramBotToken": "",
+  "telegramDestinations": []
+}

@@ -4,16 +4,16 @@ import { AlertDetector } from './AlertDetector.js';
 import { SymbolManager } from './SymbolManager.js';
 import { calculateRSI } from '../utils/rsi.js';
 import { logger } from '../utils/logger.js';
+import type { SettingsManager } from './SettingsManager.js';
 
-const INTERVALS = ['5m', '15m'] as const;
-const CANDLES_NEEDED = 20; // 14 periods + buffer
+const CANDLES_NEEDED = 100; // Need enough for accurate RSI calculation
 const POLL_INTERVAL_MS = 60_000; // poll every 60s
-const MAX_SYMBOLS_PER_EXCHANGE = 50; // cap to avoid rate limits
 
 export class RestPoller {
   private exchanges: Map<Exchange, ExchangeService>;
   private alertDetector: AlertDetector;
   private symbolManager: SymbolManager;
+  private settingsManager: SettingsManager;
   private timers: Map<Exchange, NodeJS.Timeout> = new Map();
   private scanning: Set<Exchange> = new Set();
   private scanProgress: Map<Exchange, { scanned: number; total: number }> = new Map();
@@ -23,10 +23,12 @@ export class RestPoller {
     exchanges: Map<Exchange, ExchangeService>,
     alertDetector: AlertDetector,
     symbolManager: SymbolManager,
+    settingsManager: SettingsManager
   ) {
     this.exchanges = exchanges;
     this.alertDetector = alertDetector;
     this.symbolManager = symbolManager;
+    this.settingsManager = settingsManager;
   }
 
   start(exchange: Exchange): void {
@@ -55,6 +57,15 @@ export class RestPoller {
     for (const exchange of this.scanning) this.stop(exchange);
   }
 
+  restartActiveScans(): void {
+    const active = Array.from(this.scanning);
+    for (const exchange of active) {
+      logger.info(`[RestPoller] Restarting scan for ${exchange} due to settings change`);
+      this.stop(exchange);
+      this.start(exchange);
+    }
+  }
+
   isScanning(exchange: Exchange): boolean {
     return this.scanning.has(exchange);
   }
@@ -71,7 +82,8 @@ export class RestPoller {
     }
 
     // Focus on popular USDT pairs; take top N
-    const symbols = allSymbols.slice(0, MAX_SYMBOLS_PER_EXCHANGE).map(s => s.symbol);
+    const maxSymbols = this.settingsManager.getSettings().maxScanPairs;
+    const symbols = allSymbols.slice(0, maxSymbols).map(s => s.symbol);
     logger.info(`[RestPoller] Polling ${symbols.length} symbols on ${exchange}`);
 
     // Initialize progress tracking
@@ -119,6 +131,7 @@ export class RestPoller {
           Date.now(),
           lastCandle5m.timestamp,
           lastCandle15m.timestamp,
+          rsi4h
         );
 
         // Save latest scan data for UI

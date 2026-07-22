@@ -22,6 +22,7 @@ export interface Alert {
   alertType: AlertType;
   rsi5m: number;
   rsi15m: number;
+  rsi4h?: number;
   price: number;
   timestamp: number;
   candle5mTime: number;

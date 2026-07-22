@@ -16,14 +16,15 @@ export class BitunixService extends ExchangeService {
 
       const symbols: ExchangeSymbol[] = (response.data.data || [])
         .filter((contract: any) =>
-          contract.symbolStatus === 'OPEN' &&   // Only actively trading
-          (contract.quote === 'USDT' || (typeof contract.symbol === 'string' && contract.symbol.endsWith('USDT')))  // USDT-margined only
+          contract.symbolStatus === 'OPEN' &&    // Only actively trading
+          (contract.quote === 'USDT' || (typeof contract.symbol === 'string' && contract.symbol.endsWith('USDT'))) &&  // USDT-margined only
+          (!contract.contractType || contract.contractType === 'PERPETUAL' || contract.contractType === 'SWAP')  // Perpetual/swap only
         )
         .map((contract: any) => ({
-          // Store as raw Bitunix format e.g. "BTCUSDT"
-          symbol: contract.symbol as string,    // e.g. "BTCUSDT"
+          // Store as clean BTCUSDT format
+          symbol: contract.symbol as string,
           exchange: 'Bitunix' as const,
-          baseAsset: contract.base || contract.symbol.replace('USDT', ''),
+          baseAsset: contract.base || (contract.symbol as string).replace(/USDT$/i, ''),
           quoteAsset: 'USDT',
           isActive: true,
         }));

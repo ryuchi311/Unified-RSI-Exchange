@@ -1,8 +1,31 @@
 import { useEffect, useRef } from 'react';
 import { useDashboardStore } from './useDashboardStore.js';
+import { useSettingsStore } from './useSettingsStore.js';
 
 const WS_URL = 'ws://127.0.0.1:5005';
 const RECONNECT_DELAY_MS = 3000;
+
+function playAlertChime() {
+  try {
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+    osc.frequency.exponentialRampToValueAtTime(1046.50, ctx.currentTime + 0.1); // C6
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.5);
+  } catch (e) {
+    console.error('Audio playback failed', e);
+  }
+}
 
 export function useAlerts() {
   const wsRef = useRef<WebSocket | null>(null);
@@ -35,6 +58,12 @@ export function useAlerts() {
           const alert = JSON.parse(event.data);
           console.log('[WS] Alert received:', alert.symbol, alert.alertType);
           addAlert(alert);
+          
+          // Play audio alert if enabled
+          const { audioAlertsEnabled } = useSettingsStore.getState();
+          if (audioAlertsEnabled) {
+            playAlertChime();
+          }
         } catch (e) {
           console.error('[WS] Parse error:', e, 'Data:', event.data);
         }

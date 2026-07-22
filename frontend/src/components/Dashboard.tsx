@@ -4,17 +4,25 @@ import { FilterBar } from './FilterBar.js';
 import { AlertFeed } from './AlertFeed.js';
 import { ExchangeScanner } from './ExchangeScanner.js';
 import { ChartSection } from './ChartSection.js';
+import { SettingsPanel } from './SettingsPanel.js';
 import { useAlerts } from '../hooks/useAlerts.js';
+import { useSettingsStore } from '../hooks/useSettingsStore.js';
+import { useDashboardStore } from '../hooks/useDashboardStore.js';
 
 export const Dashboard: React.FC = () => {
   useAlerts();
+  const defaultExchange = useSettingsStore((s) => s.defaultExchange);
+  const setActiveExchange = useDashboardStore((s) => s.setActiveExchange);
 
   useEffect(() => {
-    console.log('Dashboard mounted');
-  }, []);
+    if (defaultExchange) {
+      setActiveExchange(defaultExchange);
+    }
+  }, [defaultExchange, setActiveExchange]);
 
   return (
     <div className="relative min-h-screen bg-[#030712] text-slate-100" style={{ overflowY: 'auto', overflowX: 'hidden' }}>
+      <SettingsPanel />
       {/* Ambient background glows */}
       <div className="pointer-events-none fixed inset-0 z-0">
         <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-cyan-500/10 blur-[120px]" />
@@ -47,14 +55,14 @@ export const Dashboard: React.FC = () => {
 
           {/* Right: Chart + Scanner */}
           <section className="order-1 flex flex-col gap-4 xl:order-2 xl:gap-5">
-            {/* TradingView Chart */}
-            <div className="h-[420px] w-full overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0a0f1e]/80 shadow-[0_24px_64px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:h-[480px] lg:h-[540px]">
-              <ChartSection />
-            </div>
-
             {/* Exchange Scanner Cards */}
             <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0a0f1e]/60 p-3 shadow-[0_24px_64px_rgba(0,0,0,0.4)] backdrop-blur-xl sm:p-4">
               <ExchangeScanner />
+            </div>
+
+            {/* TradingView Chart */}
+            <div className="h-[420px] w-full overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0a0f1e]/80 shadow-[0_24px_64px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:h-[480px] lg:h-[540px]">
+              <ChartSection />
             </div>
           </section>
 

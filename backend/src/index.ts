@@ -10,6 +10,8 @@ import { RestPoller } from './services/RestPoller.js';
 import { APIServer } from './api/server.js';
 import { logger } from './utils/logger.js';
 import type { Exchange } from './types/shared.js';
+import { SettingsManager } from './services/SettingsManager.js';
+import { TelegramService } from './services/TelegramService.js';
 
 dotenv.config();
 
@@ -19,6 +21,11 @@ const ALERT_DEDUP_WINDOW = parseInt(process.env.ALERT_DEDUP_WINDOW || '300000', 
 
 async function main() {
   logger.info('Starting RSI Scanner Backend...');
+
+  // Initialize Settings
+  const settingsManager = new SettingsManager();
+  await settingsManager.initialize();
+  const telegramService = new TelegramService(settingsManager);
 
   // Initialize exchange services
   const exchanges = new Map<Exchange, any>([
@@ -30,10 +37,10 @@ async function main() {
 
   // Initialize services
   const symbolManager = new SymbolManager(exchanges, SYMBOL_REFRESH_INTERVAL);
-  const alertDetector = new AlertDetector(ALERT_DEDUP_WINDOW);
+  const alertDetector = new AlertDetector(settingsManager, telegramService, ALERT_DEDUP_WINDOW);
   const wsManager = new WebSocketManager(exchanges, alertDetector);
-  const restPoller = new RestPoller(exchanges, alertDetector, symbolManager);
-  const apiServer = new APIServer(alertDetector, symbolManager, wsManager, restPoller);
+  const restPoller = new RestPoller(exchanges, alertDetector, symbolManager, settingsManager);
+  const apiServer = new APIServer(alertDetector, symbolManager, wsManager, restPoller, settingsManager);
 
   try {
     // Initialize symbol cache

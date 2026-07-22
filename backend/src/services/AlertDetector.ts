@@ -1,6 +1,8 @@
 import type { Alert, AlertType, Exchange } from '../types/shared.js';
 import { generateId } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
+import type { SettingsManager } from './SettingsManager.js';
+import type { TelegramService } from './TelegramService.js';
 
 interface AlertState {
   lastAlertTime: Map<string, number>; // key: `${symbol}-${alertType}`
@@ -10,8 +12,16 @@ interface AlertState {
 export class AlertDetector {
   private alertState: AlertState;
   private listeners: ((alert: Alert) => void)[] = [];
+  private settingsManager: SettingsManager;
+  private telegramService: TelegramService;
 
-  constructor(dedupWindow: number = 300000) { // 5 minutes default
+  constructor(
+    settingsManager: SettingsManager, 
+    telegramService: TelegramService,
+    dedupWindow: number = 300000 // 5 minutes default
+  ) { 
+    this.settingsManager = settingsManager;
+    this.telegramService = telegramService;
     this.alertState = {
       lastAlertTime: new Map(),
       dedupWindow,
@@ -29,25 +39,27 @@ export class AlertDetector {
     price: number,
     timestamp: number,
     candle5mTime: number,
-    candle15mTime: number
+    candle15mTime: number,
+    rsi4h?: number | null
   ): Alert | null {
     // Need both RSI values to check conditions
     if (rsi5m === null || rsi15m === null) {
       return null;
     }
 
+    const settings = this.settingsManager.getSettings();
     let alertType: AlertType | null = null;
 
     // Check overbought conditions (both 5m and 15m must trigger)
-    if (rsi5m > 90 && rsi15m > 90) {
+    if (rsi5m > settings.tier2Overbought && rsi15m > settings.tier2Overbought) {
       alertType = 'OVERBOUGHT_TIER2';
-    } else if (rsi5m > 80 && rsi15m > 80) {
+    } else if (rsi5m > settings.tier1Overbought && rsi15m > settings.tier1Overbought) {
       alertType = 'OVERBOUGHT_TIER1';
     }
     // Check oversold conditions (both 5m and 15m must trigger)
-    else if (rsi5m < 10 && rsi15m < 10) {
+    else if (rsi5m < settings.tier2Oversold && rsi15m < settings.tier2Oversold) {
       alertType = 'OVERSOLD_TIER2';
-    } else if (rsi5m < 20 && rsi15m < 20) {
+    } else if (rsi5m < settings.tier1Oversold && rsi15m < settings.tier1Oversold) {
       alertType = 'OVERSOLD_TIER1';
     }
 
@@ -72,6 +84,7 @@ export class AlertDetector {
       alertType,
       rsi5m,
       rsi15m,
+      rsi4h: rsi4h !== null && rsi4h !== undefined ? rsi4h : undefined,
       price,
       timestamp,
       candle5mTime,
@@ -84,6 +97,11 @@ export class AlertDetector {
     // Notify listeners
     this.listeners.forEach(listener => listener(alert));
     logger.info(`Alert emitted: ${exchange} ${symbol} ${alertType} (RSI5M: ${rsi5m}, RSI15M: ${rsi15m})`);
+
+    // Dispatch to Telegram asynchronously
+    this.telegramService.sendAlert(alert).catch(err => {
+      logger.error('Error dispatching telegram alert', err);
+    });
 
     return alert;
   }
