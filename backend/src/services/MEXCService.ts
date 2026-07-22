@@ -24,8 +24,27 @@ export class MEXCService extends ExchangeService {
       await this.respectRateLimit();
       const response = await axios.get(`${this.baseUrl}/api/v1/contract/detail`);
 
+      const blacklistedPlates = [
+        'tradfi', 'commodities', 'stock', 'koreanstocks', 'semiconductors', 
+        'techgiants', 'oil', 'stockindex', 'aerospace', 'finance', 
+        'forex', 'healthcare', 'metals', 'chips', 'computing', 'cpo'
+      ];
+
       const symbols: ExchangeSymbol[] = (response.data?.data || [])
-        .filter((item: any) => item.quoteCoin === 'USDT' && item.state === 0)
+        .filter((item: any) => {
+          if (item.quoteCoin !== 'USDT' || item.state !== 0) return false;
+          
+          // Filter out non-crypto assets based on conceptPlate
+          if (item.conceptPlate) {
+            const isNonCrypto = item.conceptPlate.some((plate: string) => {
+              const p = plate.toLowerCase();
+              return blacklistedPlates.some(b => p.includes(b));
+            });
+            if (isNonCrypto) return false;
+          }
+          
+          return true;
+        })
         .map((item: any) => ({
           symbol: `${item.baseCoin}USDT`,
           exchange: 'MEXC' as const,

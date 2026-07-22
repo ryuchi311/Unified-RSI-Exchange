@@ -64,7 +64,7 @@ const getRsiMeta = (val: number) => {
 
 export const ExchangeScanner: React.FC = () => {
   const {
-    scanningExchanges, toggleScanning, setSelectedSymbol, setActiveExchange,
+    setSelectedSymbol, setActiveExchange,
     symbolSearch, rsiZoneFilter, sortBy, sortDirection,
   } = useDashboardStore();
 
@@ -124,7 +124,6 @@ export const ExchangeScanner: React.FC = () => {
         {EXCHANGES.map((exchange) => {
           const theme = THEME[exchange];
           const exStatus = status.find((s) => s.exchange === exchange);
-          const isScanning = scanningExchanges.has(exchange);
           const scanned = exStatus?.scanned ?? 0;
           const total = exStatus?.total ?? 0;
           const pct = total > 0 ? Math.min(100, (scanned / total) * 100) : 0;
@@ -179,17 +178,7 @@ export const ExchangeScanner: React.FC = () => {
                     <span className={`h-1.5 w-1.5 rounded-full ${exStatus?.scanning ? `${theme.dot} animate-pulse` : 'bg-slate-600'}`} />
                     {exStatus?.scanning ? 'Live' : 'Idle'}
                   </span>
-                  {/* Toggle scan button */}
-                  <button
-                    onClick={() => toggleScanning(exchange)}
-                    className={`rounded-lg px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-all ${
-                      isScanning
-                        ? 'bg-rose-500/15 text-rose-400 ring-1 ring-rose-500/30 hover:bg-rose-500/25'
-                        : `bg-gradient-to-r ${theme.btn} text-white shadow-sm hover:opacity-90`
-                    }`}
-                  >
-                    {isScanning ? 'Stop' : 'Start'}
-                  </button>
+
                 </div>
               </div>
 
