@@ -4,6 +4,12 @@
   "tier1Oversold": 20,
   "tier2Overbought": 90,
   "tier2Oversold": 10,
-  "telegramBotToken": "",
-  "telegramDestinations": []
+  "telegramBotToken": "8373360183:AAEnV-Y7jot-nwuHa2-5X6BbzCRyaSCJ-B4",
+  "telegramDestinations": [
+    {
+      "id": "0.37768979584198237",
+      "chatId": "-5079016681",
+      "topicId": ""
+    }
+  ]
 }
