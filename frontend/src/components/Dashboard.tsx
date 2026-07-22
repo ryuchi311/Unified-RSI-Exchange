@@ -49,7 +49,7 @@ export const Dashboard: React.FC = () => {
         <div className="flex flex-col gap-4 xl:grid xl:grid-cols-[360px_minmax(0,1fr)] xl:items-start xl:gap-5 2xl:grid-cols-[400px_minmax(0,1fr)]">
 
           {/* Left: Alert Feed */}
-          <aside className="order-3 xl:order-1 xl:sticky xl:top-[132px]">
+          <aside className="order-3 xl:order-1 xl:sticky xl:top-[132px] xl:h-[calc(100vh-160px)] h-[500px]">
             <AlertFeed />
           </aside>
 
