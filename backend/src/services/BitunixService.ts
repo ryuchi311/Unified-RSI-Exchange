@@ -2,7 +2,6 @@ import axios from 'axios';
 import type { Candle, ExchangeSymbol } from '../types/shared.js';
 import { ExchangeService } from './ExchangeService.js';
 import { logger } from '../utils/logger.js';
-import { normalizeSymbol } from '../utils/helpers.js';
 
 export class BitunixService extends ExchangeService {
   constructor() {
@@ -12,19 +11,24 @@ export class BitunixService extends ExchangeService {
   async fetchSymbols(): Promise<ExchangeSymbol[]> {
     try {
       await this.respectRateLimit();
+      // fapi.bitunix.com is the dedicated futures API domain
       const response = await axios.get(`${this.baseUrl}/api/v1/futures/market/trading_pairs`);
-      
-      const symbols: ExchangeSymbol[] = response.data.data
-        .filter((contract: any) => contract.symbolStatus === 'OPEN')
+
+      const symbols: ExchangeSymbol[] = (response.data.data || [])
+        .filter((contract: any) =>
+          contract.symbolStatus === 'OPEN' &&   // Only actively trading
+          (contract.quote === 'USDT' || (typeof contract.symbol === 'string' && contract.symbol.endsWith('USDT')))  // USDT-margined only
+        )
         .map((contract: any) => ({
-          symbol: normalizeSymbol(contract.symbol, 'Bitunix'),
+          // Store as raw Bitunix format e.g. "BTCUSDT"
+          symbol: contract.symbol as string,    // e.g. "BTCUSDT"
           exchange: 'Bitunix' as const,
-          baseAsset: contract.base,
-          quoteAsset: contract.quote,
+          baseAsset: contract.base || contract.symbol.replace('USDT', ''),
+          quoteAsset: 'USDT',
           isActive: true,
         }));
 
-      logger.info(`Fetched ${symbols.length} symbols from Bitunix`);
+      logger.info(`Fetched ${symbols.length} USDT perpetual symbols from Bitunix`);
       return symbols;
     } catch (error) {
       logger.error('Failed to fetch Bitunix symbols', error);
@@ -35,10 +39,11 @@ export class BitunixService extends ExchangeService {
   async fetchKlines(symbol: string, interval: string, limit: number = 100): Promise<Candle[]> {
     try {
       await this.respectRateLimit();
-      
+
+      // symbol is stored as "BTCUSDT" from fetchSymbols
       const response = await axios.get(`${this.baseUrl}/api/v1/futures/market/kline`, {
         params: {
-          symbol, // already in "BTCUSDT" format
+          symbol,      // "BTCUSDT"
           interval,
           limit,
         },
@@ -61,24 +66,19 @@ export class BitunixService extends ExchangeService {
   }
 
   getWebSocketUrl(): string | null {
-    return null; // stream-api.bitunix.com does not resolve; using REST polling
+    return null;
   }
 
   getSubscriptionTopic(symbol: string, interval: string): string {
-    return `swap_klines_${symbol}_USDT_${interval}`;
+    return `swap_klines_${symbol}_${interval}`;
   }
 
   parseKlineMessage(data: any): { symbol: string; interval: string; candle: Candle } | null {
     try {
-      if (!data.data || !data.data.k) {
-        return null;
-      }
-
+      if (!data.data || !data.data.k) return null;
       const k = data.data.k;
-      const symbol = data.data.s.replace('_USDT', '');
-
       return {
-        symbol: normalizeSymbol(symbol, 'Bitunix'),
+        symbol: data.data.s as string,
         interval: data.data.i,
         candle: {
           timestamp: k.t,
@@ -89,7 +89,7 @@ export class BitunixService extends ExchangeService {
           volume: parseFloat(k.v),
         },
       };
-    } catch (error) {
+    } catch {
       return null;
     }
   }

@@ -5,6 +5,11 @@ import type { RestPoller } from '../services/RestPoller.js';
 import type { Exchange } from '../types/shared.js';
 import { logger } from '../../utils/logger.js';
 
+// Normalize raw exchange symbol formats to clean BTCUSDT for frontend display
+function normalizeDisplay(symbol: string): string {
+  return symbol.replace(/[-_]/g, '').toUpperCase();
+}
+
 export function registerAlertRoutes(
   app: Express,
   symbolManager: SymbolManager,
@@ -44,7 +49,9 @@ export function registerAlertRoutes(
     try {
       const exchange = req.params.exchange as Exchange;
       const limit = parseInt(req.query.limit as string) || 50;
-      const data = restPoller?.getLatestScanData(exchange, limit) || [];
+      const raw = restPoller?.getLatestScanData(exchange, limit) || [];
+      // Normalize symbols to clean BTCUSDT format for the frontend
+      const data = raw.map(item => ({ ...item, symbol: normalizeDisplay(item.symbol) }));
       res.json({ exchange, count: data.length, data });
     } catch (error) {
       logger.error('Error fetching scan details', error);

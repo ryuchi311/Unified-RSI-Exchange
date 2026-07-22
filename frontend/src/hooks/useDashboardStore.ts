@@ -57,7 +57,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   selectedSymbol: 'BTCUSDT',
   isConnected: false,
 
-  setActiveExchange: (exchange: Exchange) => set({ activeExchange: exchange, selectedSymbol: 'BTCUSDT' }),
+  setActiveExchange: (exchange: Exchange) => set({ activeExchange: exchange }),
   
   toggleAlertFilter: (alertType: AlertType) =>
     set((state) => {

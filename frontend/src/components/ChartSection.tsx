@@ -2,12 +2,6 @@ import React, { useMemo } from 'react';
 import { useDashboardStore } from '../hooks/useDashboardStore.js';
 import { AdvancedRealTimeChart } from 'react-ts-tradingview-widgets';
 
-const TV_PREFIX: Record<string, string> = {
-  BingX: 'BINGX',
-  LBank: 'LBANK',
-  Bitunix: 'BITUNIX',
-};
-
 const INTERVAL_MAP: Record<string, string> = {
   '5M': '5',
   '15M': '15',
@@ -20,19 +14,42 @@ const EXCHANGE_STYLE: Record<string, { label: string; color: string; bg: string 
   Bitunix: { label: 'Bitunix', color: 'text-emerald-400', bg: 'bg-emerald-500/10 ring-emerald-500/30' },
 };
 
+/**
+ * Build the TradingView perpetual futures symbol string.
+ * Frontend always stores clean BTCUSDT — we re-format per exchange requirement.
+ *
+ * BingX  : BINGX:BTC-USDT.P
+ * LBank  : LBANK:BTC_USDT.P
+ * Bitunix: BITUNIX:BTCUSDT.P
+ */
+function buildTVSymbol(cleanSymbol: string, exchange: string): string {
+  // cleanSymbol is always in BTCUSDT format (no separators)
+  const base = cleanSymbol.replace(/USDT$/i, '');
+
+  switch (exchange) {
+    case 'BingX':
+      return `BINGX:${cleanSymbol}.P`;  // e.g. BINGX:ATOMUSDT.P
+    case 'LBank':
+      return `LBANK:${base}_USDT.P`;
+    case 'Bitunix':
+      return `BITUNIX:${cleanSymbol}.P`;
+    default:
+      return `BINGX:${base}-USDT.P`;
+  }
+}
+
 export const ChartSection: React.FC = () => {
   const { selectedSymbol, activeExchange, sortBy } = useDashboardStore();
 
+  const cleanSymbol = (selectedSymbol || 'BTCUSDT').replace(/[-_]/g, '').toUpperCase();
+
   const tvSymbol = useMemo(() => {
-    const symbol = (selectedSymbol || 'BTCUSDT').replace(/[-_]/g, '');
-    const prefix = TV_PREFIX[activeExchange] ?? 'BINANCE';
-    return `${prefix}:${symbol}`;
-  }, [selectedSymbol, activeExchange]);
+    return buildTVSymbol(cleanSymbol, activeExchange);
+  }, [cleanSymbol, activeExchange]);
 
   const tvInterval = (INTERVAL_MAP[sortBy] ?? '15') as any;
 
   const exStyle = EXCHANGE_STYLE[activeExchange] ?? EXCHANGE_STYLE['BingX'];
-  const displaySymbol = selectedSymbol || 'BTCUSDT';
 
   return (
     <div className="flex h-full flex-col">
@@ -44,7 +61,7 @@ export const ChartSection: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
             </svg>
           </div>
-          <span className="text-sm font-bold text-white">{displaySymbol}</span>
+          <span className="text-sm font-bold text-white">{cleanSymbol.replace('USDT', '')}</span>
           <span className="text-slate-600">/</span>
           <span className="text-xs text-slate-500">USDT Perp</span>
         </div>
@@ -57,12 +74,17 @@ export const ChartSection: React.FC = () => {
           <span className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ring-1 ${exStyle.bg} ${exStyle.color}`}>
             {exStyle.label}
           </span>
+          {/* TV symbol shown for debugging */}
+          <span className="hidden rounded-md bg-slate-800 px-2 py-0.5 text-[10px] text-slate-500 sm:inline">
+            {tvSymbol}
+          </span>
         </div>
       </div>
 
       {/* TradingView widget */}
       <div className="flex-1 min-h-0">
         <AdvancedRealTimeChart
+          key={`${tvSymbol}-${tvInterval}`}
           symbol={tvSymbol}
           interval={tvInterval}
           theme="dark"
