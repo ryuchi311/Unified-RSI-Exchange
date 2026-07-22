@@ -70,6 +70,7 @@ export const ExchangeScanner: React.FC = () => {
 
   const [status, setStatus] = useState<ExchangeStatus[]>([]);
   const [details, setDetails] = useState<Record<string, SymbolDetail[]>>({});
+  const [expandedExchange, setExpandedExchange] = useState<Exchange | null>(null);
 
   useEffect(() => {
     const fetchStatus = async () => {
@@ -119,9 +120,9 @@ export const ExchangeScanner: React.FC = () => {
         <span className="text-[11px] text-slate-600">Auto-refresh every 5s</span>
       </div>
 
-      {/* 3-column grid */}
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-        {EXCHANGES.map((exchange) => {
+      {/* Dynamic grid layout */}
+      <div className={`grid gap-3 ${expandedExchange ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+        {EXCHANGES.filter(ex => !expandedExchange || ex === expandedExchange).map((exchange) => {
           const theme = THEME[exchange];
           const exStatus = status.find((s) => s.exchange === exchange);
           const scanned = exStatus?.scanned ?? 0;
@@ -179,6 +180,22 @@ export const ExchangeScanner: React.FC = () => {
                     {exStatus?.scanning ? 'Live' : 'Idle'}
                   </span>
 
+                  {/* Expand / Collapse Button */}
+                  <button
+                    onClick={() => setExpandedExchange(expandedExchange === exchange ? null : exchange)}
+                    className="flex h-5 w-5 items-center justify-center rounded-md bg-white/[0.05] text-slate-400 hover:bg-white/[0.1] hover:text-white transition-colors"
+                    title={expandedExchange === exchange ? 'Collapse' : 'Expand'}
+                  >
+                    {expandedExchange === exchange ? (
+                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    ) : (
+                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                      </svg>
+                    )}
+                  </button>
                 </div>
               </div>
 
@@ -199,7 +216,7 @@ export const ExchangeScanner: React.FC = () => {
               )}
 
               {/* Symbol list */}
-              <div className="flex-1 overflow-y-auto p-2" style={{ maxHeight: 420, scrollbarWidth: 'thin', scrollbarColor: 'rgba(100,116,139,0.2) transparent' }}>
+              <div className="flex-1 overflow-y-auto p-2" style={{ maxHeight: expandedExchange === exchange ? 'calc(100vh - 250px)' : 420, scrollbarWidth: 'thin', scrollbarColor: 'rgba(100,116,139,0.2) transparent' }}>
                 {syms.length === 0 ? (
                   <div className="flex h-32 flex-col items-center justify-center gap-2 text-center">
                     <div className="text-2xl opacity-30">📊</div>
@@ -208,7 +225,7 @@ export const ExchangeScanner: React.FC = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-1.5">
+                  <div className={expandedExchange === exchange ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2" : "flex flex-col gap-1.5"}>
                     {syms.map((item) => (
                       <button
                         key={item.symbol}
