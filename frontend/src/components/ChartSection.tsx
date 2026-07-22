@@ -10,7 +10,7 @@ const INTERVAL_MAP: Record<string, string> = {
 
 const EXCHANGE_STYLE: Record<string, { label: string; color: string; bg: string }> = {
   BingX:   { label: 'BingX',   color: 'text-cyan-400',    bg: 'bg-cyan-500/10 ring-cyan-500/30' },
-  LBank:   { label: 'LBank',   color: 'text-amber-400',   bg: 'bg-amber-500/10 ring-amber-500/30' },
+  MEXC:    { label: 'MEXC',    color: 'text-teal-400',    bg: 'bg-teal-500/10 ring-teal-500/30' },
   Bitunix: { label: 'Bitunix', color: 'text-emerald-400', bg: 'bg-emerald-500/10 ring-emerald-500/30' },
 };
 
@@ -19,7 +19,7 @@ const EXCHANGE_STYLE: Record<string, { label: string; color: string; bg: string 
  * Frontend always stores clean BTCUSDT — we re-format per exchange requirement.
  *
  * BingX  : BINGX:BTC-USDT.P
- * LBank  : LBANK:BTC_USDT.P
+ * MEXC   : MEXC:BTCUSDT.P
  * Bitunix: BITUNIX:BTCUSDT.P
  */
 function buildTVSymbol(cleanSymbol: string, exchange: string): string {
@@ -29,8 +29,8 @@ function buildTVSymbol(cleanSymbol: string, exchange: string): string {
   switch (exchange) {
     case 'BingX':
       return `BINGX:${base}USDT.P`;
-    case 'LBank':
-      return `LBANK:${base}USDT.P`;
+    case 'MEXC':
+      return `MEXC:${base}USDT.P`;
     case 'Bitunix':
       return `BITUNIX:${base}USDT.P`;
     default:

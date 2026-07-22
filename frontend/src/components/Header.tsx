@@ -8,7 +8,7 @@ export const Header: React.FC = () => {
 
   const exchanges = [
     { name: 'BingX', dot: 'bg-cyan-400', ring: 'ring-cyan-500/30', text: 'text-cyan-300', bg: 'bg-cyan-500/10' },
-    { name: 'LBank', dot: 'bg-amber-400', ring: 'ring-amber-500/30', text: 'text-amber-300', bg: 'bg-amber-500/10' },
+    { name: 'MEXC', dot: 'bg-teal-400', ring: 'ring-teal-500/30', text: 'text-teal-300', bg: 'bg-teal-500/10' },
     { name: 'Bitunix', dot: 'bg-emerald-400', ring: 'ring-emerald-500/30', text: 'text-emerald-300', bg: 'bg-emerald-500/10' },
   ];
 

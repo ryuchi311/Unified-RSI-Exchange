@@ -11,7 +11,7 @@ const ALERT_META: Record<string, { label: string; color: string; bg: string; rin
 
 const EXCHANGE_COLORS: Record<string, string> = {
   BingX: 'text-cyan-400',
-  LBank: 'text-amber-400',
+  MEXC: 'text-teal-400',
   Bitunix: 'text-emerald-400',
 };
 

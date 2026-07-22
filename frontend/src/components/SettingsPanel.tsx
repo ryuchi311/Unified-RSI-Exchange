@@ -154,7 +154,7 @@ export const SettingsPanel: React.FC = () => {
                 onChange={(e) => setDefaultExchange(e.target.value as Exchange)}
               >
                 <option value="BingX">BingX Perpetual</option>
-                <option value="LBank">LBank Perpetual</option>
+                <option value="MEXC">MEXC Perpetual</option>
                 <option value="Bitunix">Bitunix Perpetual</option>
               </select>
             </div>

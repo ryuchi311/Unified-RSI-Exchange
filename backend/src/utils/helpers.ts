@@ -8,12 +8,10 @@ export function sleep(ms: number): Promise<void> {
 
 export function normalizeSymbol(symbol: string, exchange: string): string {
   // Convert different exchange symbol formats to standard BASEUSDT format
-  const normalized = symbol.toUpperCase().replace(/[-_]/, '');
+  const normalized = symbol.toUpperCase().replace(/[-_]/g, '');
   
   // Handle exchange-specific formats
   switch (exchange) {
-    case 'LBank':
-      return normalized.replace('_USDT', 'USDT').replace('_', '');
     case 'MEXC':
       return normalized.replace('_USDT', 'USDT').replace('_', '');
     case 'BingX':

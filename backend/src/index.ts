@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import { BingXService } from './services/BingXService.js';
-import { LBankService } from './services/LBankService.js';
 import { MEXCService } from './services/MEXCService.js';
 import { BitunixService } from './services/BitunixService.js';
 import { SymbolManager } from './services/SymbolManager.js';
@@ -30,7 +29,6 @@ async function main() {
   // Initialize exchange services
   const exchanges = new Map<Exchange, any>([
     ['BingX', new BingXService()],
-    ['LBank', new LBankService()],
     ['MEXC', new MEXCService()],
     ['Bitunix', new BitunixService()],
   ]);
@@ -52,9 +50,9 @@ async function main() {
       await wsManager.connect(exchange);
     }
 
-    // Start REST polling for RSI scanning (works for BingX + Bitunix)
+    // Start REST polling for RSI scanning across all perpetual futures exchanges
     logger.info('Starting REST polling scanner...');
-    const pollableExchanges: Exchange[] = ['BingX', 'Bitunix'];
+    const pollableExchanges: Exchange[] = ['BingX', 'MEXC', 'Bitunix'];
     for (const exchange of pollableExchanges) {
       restPoller.start(exchange);
     }

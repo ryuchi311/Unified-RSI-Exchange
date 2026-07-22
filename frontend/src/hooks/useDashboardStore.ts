@@ -102,7 +102,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
   startAllScanning: () =>
     set({
-      scanningExchanges: new Set(['BingX', 'LBank', 'Bitunix']),
+      scanningExchanges: new Set(['BingX', 'MEXC', 'Bitunix']),
       isScanning: true,
     }),
 
@@ -130,7 +130,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
   addAlert: (alert: Alert) =>
     set((state) => {
-      const alerts = [alert, ...state.alerts].slice(0, 100); // Keep last 100
+      const alerts = [alert, ...state.alerts].slice(0, 30); // Keep last 30
       return { alerts };
     }),
 
