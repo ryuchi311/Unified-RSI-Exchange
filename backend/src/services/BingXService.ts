@@ -45,7 +45,7 @@ export class BingXService extends ExchangeService {
       // Reconstruct BingX API format: BTCUSDT → BTC-USDT
       const bingxSymbol = symbol.includes('-') ? symbol : `${symbol.replace(/USDT$/i, '')}-USDT`;
 
-      const response = await axios.get(`${this.baseUrl}/openApi/swap/v2/quote/klines`, {
+      const response = await axios.get(`${this.baseUrl}/openApi/swap/v3/quote/klines`, {
         params: {
           symbol: bingxSymbol,
           interval,
@@ -53,13 +53,18 @@ export class BingXService extends ExchangeService {
         },
       });
 
-      const candles: Candle[] = (response.data.data || []).map((k: any) => ({
-        timestamp: k.time,
+      const rawData = response.data.data || [];
+      // CRITICAL FIX: Reverse raw data array because BingX API returns candles newest-first.
+      // Reversing puts candles in chronological order (oldest -> newest), required for Wilder's RSI.
+      const reversed = [...rawData].reverse();
+
+      const candles: Candle[] = reversed.map((k: any) => ({
+        timestamp: parseInt(k.time),
         open: parseFloat(k.open),
         high: parseFloat(k.high),
         low: parseFloat(k.low),
         close: parseFloat(k.close),
-        volume: parseFloat(k.volume),
+        volume: parseFloat(k.volume || '0'),
       }));
 
       return candles;

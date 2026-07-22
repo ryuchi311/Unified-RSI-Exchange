@@ -4,16 +4,16 @@ import type { Candle, ExchangeSymbol } from '../types/shared.js';
 import { ExchangeService } from './ExchangeService.js';
 import { logger } from '../utils/logger.js';
 
-// LBank perp uses different interval names
+// LBank spot kline API uses minute5, minute15, hour4 etc.
 const INTERVAL_MAP: Record<string, string> = {
-  '1m': '1min',
-  '5m': '5min',
-  '15m': '15min',
-  '30m': '30min',
-  '1h': '1hour',
-  '4h': '4hour',
-  '1d': '1day',
-  '1w': '1week',
+  '1m': 'minute1',
+  '5m': 'minute5',
+  '15m': 'minute15',
+  '30m': 'minute30',
+  '1h': 'hour1',
+  '4h': 'hour4',
+  '1d': 'day1',
+  '1w': 'week1',
 };
 
 // LBank's API frequently has SSL certificate chain issues
@@ -101,7 +101,7 @@ export class LBankService extends ExchangeService {
         logger.warn(`[LBank] Spot kline returned 0 candles for ${spotSymbol} ${interval}`);
       }
 
-      return rawData.map((k: any) => ({
+      const candles: Candle[] = rawData.map((k: any) => ({
         timestamp: parseInt(k[0]) < 1e12 ? parseInt(k[0]) * 1000 : parseInt(k[0]), // handle s or ms
         open:   parseFloat(k[1]),
         high:   parseFloat(k[2]),
@@ -109,6 +109,8 @@ export class LBankService extends ExchangeService {
         close:  parseFloat(k[4]),
         volume: parseFloat(k[5]),
       }));
+
+      return candles.sort((a, b) => a.timestamp - b.timestamp);
     } catch (error) {
       logger.error(`Failed to fetch LBank klines for ${symbol}`, error);
       return [];

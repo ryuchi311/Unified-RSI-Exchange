@@ -6,7 +6,7 @@ import { calculateRSI } from '../utils/rsi.js';
 import { logger } from '../utils/logger.js';
 import type { SettingsManager } from './SettingsManager.js';
 
-const CANDLES_NEEDED = 100; // Need enough for accurate RSI calculation
+const CANDLES_NEEDED = 150; // Need enough for accurate Wilder's RSI calculation
 const POLL_INTERVAL_MS = 60_000; // poll every 60s
 
 export class RestPoller {

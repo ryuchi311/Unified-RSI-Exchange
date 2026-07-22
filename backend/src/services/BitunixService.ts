@@ -59,7 +59,7 @@ export class BitunixService extends ExchangeService {
         volume: parseFloat(k.quoteVol || k.baseVol || '0'),
       }));
 
-      return candles;
+      return candles.sort((a, b) => a.timestamp - b.timestamp);
     } catch (error) {
       logger.error(`Failed to fetch Bitunix klines for ${symbol}`, error);
       return [];
