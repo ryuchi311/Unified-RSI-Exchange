@@ -39,7 +39,11 @@ function buildTVSymbol(cleanSymbol: string, exchange: string): string {
 }
 
 export const ChartSection: React.FC = () => {
-  const { selectedSymbol, activeExchange, sortBy, isChartExpanded, toggleChartExpanded } = useDashboardStore();
+  const selectedSymbol = useDashboardStore(s => s.selectedSymbol);
+  const activeExchange = useDashboardStore(s => s.activeExchange);
+  const sortBy = useDashboardStore(s => s.sortBy);
+  const isChartExpanded = useDashboardStore(s => s.isChartExpanded);
+  const toggleChartExpanded = useDashboardStore(s => s.toggleChartExpanded);
 
   const cleanSymbol = (selectedSymbol || 'BTCUSDT').replace(/[-_]/g, '').toUpperCase();
 
@@ -113,18 +117,20 @@ export const ChartSection: React.FC = () => {
 
       {/* TradingView widget */}
       <div className="flex-1 min-h-0">
-        <AdvancedRealTimeChart
-          key={`${tvSymbol}-${tvInterval}`}
-          symbol={tvSymbol}
-          interval={tvInterval}
-          theme="dark"
-          width="100%"
-          height="100%"
-          allow_symbol_change={false}
-          hide_side_toolbar={true}
-          enable_publishing={false}
-          studies={["RSI@tv-basicstudies"]}
-        />
+        {useMemo(() => (
+          <AdvancedRealTimeChart
+            key={`${tvSymbol}-${tvInterval}`}
+            symbol={tvSymbol}
+            interval={tvInterval}
+            theme="dark"
+            width="100%"
+            height="100%"
+            allow_symbol_change={false}
+            hide_side_toolbar={true}
+            enable_publishing={false}
+            studies={["RSI@tv-basicstudies"]}
+          />
+        ), [tvSymbol, tvInterval])}
       </div>
     </div>
   );
