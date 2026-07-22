@@ -39,7 +39,7 @@ function buildTVSymbol(cleanSymbol: string, exchange: string): string {
 }
 
 export const ChartSection: React.FC = () => {
-  const { selectedSymbol, activeExchange, sortBy } = useDashboardStore();
+  const { selectedSymbol, activeExchange, sortBy, isChartExpanded, toggleChartExpanded } = useDashboardStore();
 
   const cleanSymbol = (selectedSymbol || 'BTCUSDT').replace(/[-_]/g, '').toUpperCase();
 
@@ -78,6 +78,36 @@ export const ChartSection: React.FC = () => {
           <span className="hidden rounded-md bg-slate-800 px-2 py-0.5 text-[10px] text-slate-500 sm:inline">
             {tvSymbol}
           </span>
+          {/* External link to TradingView */}
+          <a
+            href={`https://www.tradingview.com/chart/?symbol=${tvSymbol}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 rounded-md bg-white/[0.05] px-2 py-0.5 text-[11px] font-semibold text-slate-300 hover:bg-white/[0.1] hover:text-white transition-colors border border-white/10 ml-1"
+            title="Open in TradingView"
+          >
+            Open in TV
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+          
+          {/* Expand / Collapse Toggle */}
+          <button
+            onClick={toggleChartExpanded}
+            className="flex h-6 w-6 items-center justify-center rounded-md bg-white/[0.05] text-slate-400 hover:bg-white/[0.1] hover:text-white transition-colors border border-white/10 ml-1"
+            title={isChartExpanded ? 'Collapse Chart' : 'Expand Chart'}
+          >
+            {isChartExpanded ? (
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
 
@@ -93,6 +123,7 @@ export const ChartSection: React.FC = () => {
           allow_symbol_change={false}
           hide_side_toolbar={true}
           enable_publishing={false}
+          studies={["RSI@tv-basicstudies"]}
         />
       </div>
     </div>

@@ -13,6 +13,7 @@ export const Dashboard: React.FC = () => {
   useAlerts();
   const defaultExchange = useSettingsStore((s) => s.defaultExchange);
   const setActiveExchange = useDashboardStore((s) => s.setActiveExchange);
+  const isChartExpanded = useDashboardStore((s) => s.isChartExpanded);
 
   useEffect(() => {
     if (defaultExchange) {
@@ -56,12 +57,14 @@ export const Dashboard: React.FC = () => {
           {/* Right: Chart + Scanner */}
           <section className="order-2 flex flex-col gap-4 xl:gap-5">
             {/* Exchange Scanner Cards */}
-            <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0a0f1e]/60 p-3 shadow-[0_24px_64px_rgba(0,0,0,0.4)] backdrop-blur-xl sm:p-4">
-              <ExchangeScanner />
-            </div>
+            {!isChartExpanded && (
+              <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0a0f1e]/60 p-3 shadow-[0_24px_64px_rgba(0,0,0,0.4)] backdrop-blur-xl sm:p-4">
+                <ExchangeScanner />
+              </div>
+            )}
 
             {/* TradingView Chart */}
-            <div className="h-[420px] w-full overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0a0f1e]/80 shadow-[0_24px_64px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:h-[480px] lg:h-[540px]">
+            <div className={`w-full overflow-hidden rounded-2xl border border-white/[0.07] bg-[#0a0f1e]/80 shadow-[0_24px_64px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all duration-300 ${isChartExpanded ? 'h-[calc(100vh-160px)]' : 'h-[420px] sm:h-[480px] lg:h-[540px]'}`}>
               <ChartSection />
             </div>
           </section>

@@ -12,6 +12,7 @@ export interface DashboardState {
   rsiZoneFilter: 'ALL' | 'OB' | 'XOB' | 'OS' | 'XOS';
   sortBy: 'ZONE' | '5M' | '15M' | '4H' | 'SYMBOL';
   sortDirection: 'asc' | 'desc';
+  isChartExpanded: boolean;
 
   // Data
   alerts: Alert[];
@@ -37,6 +38,7 @@ export interface DashboardState {
   setSelectedAlert: (alert: Alert | null) => void;
   setSelectedSymbol: (symbol: string) => void;
   setConnected: (connected: boolean) => void;
+  toggleChartExpanded: () => void;
 
   // Filtering
   getFilteredAlerts: () => Alert[];
@@ -50,8 +52,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   scanningExchanges: new Set(),
   symbolSearch: '',
   rsiZoneFilter: 'ALL',
-  sortBy: 'ZONE',
+  sortBy: '5M',
   sortDirection: 'desc',
+  isChartExpanded: false,
   alerts: [],
   selectedAlert: null,
   selectedSymbol: 'BTCUSDT',
@@ -141,6 +144,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   setSelectedSymbol: (symbol: string) => set({ selectedSymbol: symbol }),
 
   setConnected: (connected: boolean) => set({ isConnected: connected }),
+
+  toggleChartExpanded: () => set((state) => ({ isChartExpanded: !state.isChartExpanded })),
 
   getFilteredAlerts: () => {
     const state = get();
