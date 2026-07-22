@@ -79,15 +79,15 @@ export const AlertFeed: React.FC = () => {
                       <span className="text-slate-600">·</span>
                       <span className="text-xs font-bold text-white">{alert.symbol}</span>
                     </div>
-                    <span className="shrink-0 text-[10px] text-slate-600">{formatTime(alert.timestamp)}</span>
+                    <span className="shrink-0 text-[10px] text-slate-200 font-medium">{formatTime(alert.timestamp)}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ring-1 ${meta.bg} ${meta.color} ${meta.ring}`}>
                       {meta.label}
                     </span>
-                    <div className="flex items-center gap-2 text-[10px] text-slate-500">
-                      <span>5m <span className="font-mono text-slate-400">{alert.rsi5m.toFixed(1)}</span></span>
-                      <span>15m <span className="font-mono text-slate-400">{alert.rsi15m.toFixed(1)}</span></span>
+                    <div className="flex items-center gap-2 text-[10px] text-slate-300">
+                      <span>5m <span className="font-mono text-white font-bold">{alert.rsi5m.toFixed(1)}</span></span>
+                      <span>15m <span className="font-mono text-white font-bold">{alert.rsi15m.toFixed(1)}</span></span>
                     </div>
                   </div>
                 </button>
