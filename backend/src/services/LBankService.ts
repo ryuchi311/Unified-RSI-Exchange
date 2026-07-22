@@ -63,21 +63,23 @@ export class LBankService extends ExchangeService {
 
       // Reconstruct LBank API format: BTCUSDT → BTC_USDT
       const lbankSymbol = symbol.includes('_') ? symbol : `${symbol.replace(/USDT$/i, '')}_USDT`;
-      
-      // LBank Futures API doesn't have a kline endpoint. We must pull from their SPOT API.
-      // Spot API requires lowercase symbol like "btc_usdt"
-      const spotSymbol = lbankSymbol.toLowerCase();
 
-      // Map standard interval to LBank format (5m → 5min, 4h → 4hour)
+      // NOTE: LBank's perpetual CFD kline API (/cfd/openApi/v1/pub/klines) requires
+      // authentication (returns 403 for public requests). There is no public perp kline API.
+      // We use the LBank SPOT kline as a proxy — for USDT-settled perpetuals, spot and
+      // perp prices are virtually identical (funding rate is the only minor difference).
+      // This is the standard approach used by most open-source scanners for LBank.
+      const spotSymbol = lbankSymbol.toLowerCase(); // e.g. "btc_usdt"
+
+      // Map standard interval to LBank format
       const lbankInterval = INTERVAL_MAP[interval] || interval;
-      
-      // LBank kline time param is the START time, not end time
-      // We calculate start time = now - (interval_seconds * limit)
-      let intervalSeconds = 300; // default 5m
-      if (interval === '15m') intervalSeconds = 900;
-      else if (interval === '4h') intervalSeconds = 14400;
-      
-      const startTime = Math.floor(Date.now() / 1000) - (intervalSeconds * limit);
+
+      // LBank's time param = start timestamp in seconds
+      const intervalSeconds: Record<string, number> = {
+        '5m': 300, '15m': 900, '1h': 3600, '4h': 14400, '1d': 86400
+      };
+      const secPerBar = intervalSeconds[interval] ?? 300;
+      const startTime = Math.floor(Date.now() / 1000) - secPerBar * limit;
 
       const response = await axios.get(`https://api.lbkex.com/v2/kline.do`, {
         params: {
@@ -87,23 +89,26 @@ export class LBankService extends ExchangeService {
           time: startTime,
         },
         httpsAgent,
+        timeout: 10000,
       });
 
-      // LBank spot kline format:
-      // data: [[timestamp, open, high, low, close, volume], ...]
-      const rawData: any[] = response.data?.data || [];
+      // LBank v2 kline: [[timestamp_s, open, high, low, close, volume], ...]
+      const rawData: any[] = Array.isArray(response.data?.data)
+        ? response.data.data
+        : Array.isArray(response.data) ? response.data : [];
 
-      const candles: Candle[] = rawData.map((k: any) => ({
-        // LBank spot API returns time in seconds, we need ms
-        timestamp: parseInt(k[0]) * 1000,
-        open: parseFloat(k[1]),
-        high: parseFloat(k[2]),
-        low: parseFloat(k[3]),
-        close: parseFloat(k[4]),
+      if (rawData.length === 0) {
+        logger.warn(`[LBank] Spot kline returned 0 candles for ${spotSymbol} ${interval}`);
+      }
+
+      return rawData.map((k: any) => ({
+        timestamp: parseInt(k[0]) < 1e12 ? parseInt(k[0]) * 1000 : parseInt(k[0]), // handle s or ms
+        open:   parseFloat(k[1]),
+        high:   parseFloat(k[2]),
+        low:    parseFloat(k[3]),
+        close:  parseFloat(k[4]),
         volume: parseFloat(k[5]),
       }));
-
-      return candles;
     } catch (error) {
       logger.error(`Failed to fetch LBank klines for ${symbol}`, error);
       return [];

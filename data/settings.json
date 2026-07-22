@@ -1,5 +1,5 @@
 {
-  "maxScanPairs": 300,
+  "maxScanPairs": 200,
   "tier1Overbought": 80,
   "tier1Oversold": 20,
   "tier2Overbought": 90,
