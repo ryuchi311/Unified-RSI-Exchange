@@ -67,8 +67,8 @@ echo ==========================================
 echo [✓] Both servers started!
 echo ==========================================
 echo.
-echo Frontend:  http://localhost:3000
-echo Backend:   http://localhost:3001
+echo Frontend:  http://localhost:5175
+echo Backend:   http://localhost:5005
 echo.
 echo Press Ctrl+C in each window to stop servers
 echo.

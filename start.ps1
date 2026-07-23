@@ -71,6 +71,6 @@ Write-Host "`n========================================" -ForegroundColor Green
 Write-Host "[✓] Both servers started!" -ForegroundColor Green
 Write-Host "========================================`n" -ForegroundColor Green
 
-Write-Host "Frontend:  http://localhost:3000" -ForegroundColor Cyan
-Write-Host "Backend:   http://localhost:3001" -ForegroundColor Cyan
+Write-Host "Frontend:  http://localhost:5175" -ForegroundColor Cyan
+Write-Host "Backend:   http://localhost:5005" -ForegroundColor Cyan
 Write-Host "`nPress Ctrl+C in each window to stop servers`n" -ForegroundColor Yellow
