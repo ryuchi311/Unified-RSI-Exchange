@@ -27,11 +27,15 @@ export class TelegramService {
     const cleanBase = alert.symbol
       .replace(/[-_]USDT$/i, '')
       .replace(/USDT$/i, '');
+
     // Indicators: 🟩 for oversold, 🟥 for overbought, 🟪 for 4h
     const square = isOverbought ? '🟥' : '🟩';
-    const rsi5 = alert.rsi5m.toFixed(1);
-    const rsi15 = alert.rsi15m.toFixed(1);
-    const rsi4hStr = alert.rsi4h !== undefined ? alert.rsi4h.toFixed(1) : 'N/A';
+    const k5 = alert.k5m.toFixed(1);
+    const d5 = alert.d5m.toFixed(1);
+    const k15 = alert.k15m.toFixed(1);
+    const d15 = alert.d15m.toFixed(1);
+    const k4hStr = alert.k4h !== undefined ? alert.k4h.toFixed(1) : 'N/A';
+    const d4hStr = alert.d4h !== undefined ? alert.d4h.toFixed(1) : 'N/A';
 
     const moveDirection = isOverbought ? 'Extended up move' : 'Extended down move';
 
@@ -40,8 +44,10 @@ export class TelegramService {
     const tvUrl = `https://www.tradingview.com/chart/?symbol=${tvSymbol}`;
 
     return [
-      `${arrow} ${alert.exchange} ${cleanBase} · RSI ${label}`,
-      `${square} 5m ${rsi5}  |  ${square} 15m ${rsi15}  |  🟪 4h ${rsi4hStr}`,
+      `${arrow} ${alert.exchange} ${cleanBase} · StochRSI ${label}`,
+      `${square} 5m  K:${k5} D:${d5}`,
+      `${square} 15m K:${k15} D:${d15}`,
+      `🟪 4h  K:${k4hStr} D:${d4hStr}`,
       `${moveDirection} · <a href="${tvUrl}">TradingView</a>`
     ].join('\n');
   }
@@ -76,6 +82,9 @@ export class TelegramService {
       } catch (error: any) {
         logger.error(`Failed to send Telegram alert to ${dest.chatId}`, error.response?.data || error.message);
       }
+
+      // Small delay between destinations to avoid Telegram 429 rate limits
+      await new Promise(r => setTimeout(r, 300));
     }
   }
 }

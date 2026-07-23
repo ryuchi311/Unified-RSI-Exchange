@@ -29,37 +29,50 @@ export class AlertDetector {
   }
 
   /**
-   * Check RSI conditions and emit alert if triggered
+   * Check StochRSI conditions and emit alert if triggered.
+   * Alert fires when BOTH %K AND %D on BOTH 5m and 15m cross the threshold.
    */
   checkAndEmitAlert(
     exchange: Exchange,
     symbol: string,
-    rsi5m: number | null,
-    rsi15m: number | null,
+    stoch5m: { k: number; d: number } | null,
+    stoch15m: { k: number; d: number } | null,
     price: number,
     timestamp: number,
     candle5mTime: number,
     candle15mTime: number,
-    rsi4h?: number | null
+    stoch4h?: { k: number; d: number } | null
   ): Alert | null {
-    // Need both RSI values to check conditions
-    if (rsi5m === null || rsi15m === null) {
+    // Need both StochRSI values to check conditions
+    if (stoch5m === null || stoch15m === null) {
       return null;
     }
 
     const settings = this.settingsManager.getSettings();
     let alertType: AlertType | null = null;
 
-    // Check overbought conditions (both 5m and 15m must trigger)
-    if (rsi5m > settings.tier2Overbought && rsi15m > settings.tier2Overbought) {
+    // Check overbought conditions (K AND D must both be above threshold on 5m AND 15m)
+    if (
+      stoch5m.k > settings.tier2Overbought && stoch5m.d > settings.tier2Overbought &&
+      stoch15m.k > settings.tier2Overbought && stoch15m.d > settings.tier2Overbought
+    ) {
       alertType = 'OVERBOUGHT_TIER2';
-    } else if (rsi5m > settings.tier1Overbought && rsi15m > settings.tier1Overbought) {
+    } else if (
+      stoch5m.k > settings.tier1Overbought && stoch5m.d > settings.tier1Overbought &&
+      stoch15m.k > settings.tier1Overbought && stoch15m.d > settings.tier1Overbought
+    ) {
       alertType = 'OVERBOUGHT_TIER1';
     }
-    // Check oversold conditions (both 5m and 15m must trigger)
-    else if (rsi5m < settings.tier2Oversold && rsi15m < settings.tier2Oversold) {
+    // Check oversold conditions (K AND D must both be below threshold on 5m AND 15m)
+    else if (
+      stoch5m.k < settings.tier2Oversold && stoch5m.d < settings.tier2Oversold &&
+      stoch15m.k < settings.tier2Oversold && stoch15m.d < settings.tier2Oversold
+    ) {
       alertType = 'OVERSOLD_TIER2';
-    } else if (rsi5m < settings.tier1Oversold && rsi15m < settings.tier1Oversold) {
+    } else if (
+      stoch5m.k < settings.tier1Oversold && stoch5m.d < settings.tier1Oversold &&
+      stoch15m.k < settings.tier1Oversold && stoch15m.d < settings.tier1Oversold
+    ) {
       alertType = 'OVERSOLD_TIER1';
     }
 
@@ -82,9 +95,12 @@ export class AlertDetector {
       exchange,
       symbol,
       alertType,
-      rsi5m,
-      rsi15m,
-      rsi4h: rsi4h !== null && rsi4h !== undefined ? rsi4h : undefined,
+      k5m: stoch5m.k,
+      d5m: stoch5m.d,
+      k15m: stoch15m.k,
+      d15m: stoch15m.d,
+      k4h: stoch4h?.k,
+      d4h: stoch4h?.d,
       price,
       timestamp,
       candle5mTime,
@@ -96,7 +112,10 @@ export class AlertDetector {
 
     // Notify listeners
     this.listeners.forEach(listener => listener(alert));
-    logger.info(`Alert emitted: ${exchange} ${symbol} ${alertType} (RSI5M: ${rsi5m}, RSI15M: ${rsi15m})`);
+    logger.info(
+      `Alert emitted: ${exchange} ${symbol} ${alertType} ` +
+      `(StochRSI 5M K:${stoch5m.k} D:${stoch5m.d}, 15M K:${stoch15m.k} D:${stoch15m.d})`
+    );
 
     // Dispatch to Telegram asynchronously
     this.telegramService.sendAlert(alert).catch(err => {

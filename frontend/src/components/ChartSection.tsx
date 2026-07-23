@@ -128,7 +128,7 @@ export const ChartSection: React.FC = () => {
             allow_symbol_change={false}
             hide_side_toolbar={true}
             enable_publishing={false}
-            studies={["RSI@tv-basicstudies"]}
+            studies={["StochasticRSI@tv-basicstudies"]}
           />
         ), [tvSymbol, tvInterval])}
       </div>

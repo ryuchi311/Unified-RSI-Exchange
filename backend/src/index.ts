@@ -19,7 +19,7 @@ const SYMBOL_REFRESH_INTERVAL = parseInt(process.env.SYMBOL_REFRESH_INTERVAL || 
 const ALERT_DEDUP_WINDOW = parseInt(process.env.ALERT_DEDUP_WINDOW || '300000', 10);
 
 async function main() {
-  logger.info('Starting RSI Scanner Backend...');
+  logger.info('Starting RSI Stochastic Scanner Backend...');
 
   // Initialize Settings
   const settingsManager = new SettingsManager();
@@ -50,7 +50,7 @@ async function main() {
       await wsManager.connect(exchange);
     }
 
-    // Start REST polling for RSI scanning across all perpetual futures exchanges
+    // Start REST polling for StochRSI scanning across all perpetual futures exchanges
     logger.info('Starting REST polling scanner...');
     const pollableExchanges: Exchange[] = ['BingX', 'MEXC', 'Bitunix'];
     for (const exchange of pollableExchanges) {
@@ -65,7 +65,7 @@ async function main() {
     // Start API server
     apiServer.start(PORT);
 
-    logger.info('RSI Scanner Backend started successfully');
+    logger.info('RSI Stochastic Scanner Backend started successfully');
 
     // TODO: Subscribe to symbols after they're loaded
     // For now, this would need to be triggered via API or startup config

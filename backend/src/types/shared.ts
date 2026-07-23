@@ -20,9 +20,13 @@ export interface Alert {
   exchange: Exchange;
   symbol: string;
   alertType: AlertType;
-  rsi5m: number;
-  rsi15m: number;
-  rsi4h?: number;
+  // StochRSI %K and %D lines per timeframe
+  k5m: number;
+  d5m: number;
+  k15m: number;
+  d15m: number;
+  k4h?: number;
+  d4h?: number;
   price: number;
   timestamp: number;
   candle5mTime: number;
@@ -46,9 +50,11 @@ export interface ScannerState {
   error?: string;
 }
 
-export interface RSIValues {
-  rsi5m: number | null;
-  rsi15m: number | null;
+export interface StochRSIValues {
+  k5m: number | null;
+  d5m: number | null;
+  k15m: number | null;
+  d15m: number | null;
   candle5mTime: number;
   candle15mTime: number;
 }

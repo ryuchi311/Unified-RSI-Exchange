@@ -14,9 +14,12 @@ interface ExchangeStatus {
 
 interface SymbolDetail {
   symbol: string;
-  rsi5m: number;
-  rsi15m: number;
-  rsi4h: number;
+  k5m: number;
+  d5m: number;
+  k15m: number;
+  d15m: number;
+  k4h: number;
+  d4h: number;
   price: number;
   timestamp: number;
 }
@@ -54,12 +57,13 @@ const THEME = {
   },
 };
 
-const getRsiMeta = (val: number) => {
-  if (val >= 80) return { bar: 'from-red-500 to-rose-600', text: 'text-rose-400', label: 'XOB' };
-  if (val >= 70) return { bar: 'from-amber-500 to-orange-500', text: 'text-amber-400', label: 'OB' };
-  if (val <= 20) return { bar: 'from-violet-500 to-purple-600', text: 'text-violet-400', label: 'XOS' };
-  if (val <= 30) return { bar: 'from-blue-500 to-indigo-500', text: 'text-blue-400', label: 'OS' };
-  return { bar: 'from-slate-600 to-slate-500', text: 'text-slate-500', label: 'NEU' };
+/** Get bar colour and label based on StochRSI %K value */
+const getStochMeta = (val: number) => {
+  if (val >= 80) return { bar: 'from-red-500 to-rose-600', kText: 'text-rose-400', label: 'XOB' };
+  if (val >= 70) return { bar: 'from-amber-500 to-orange-500', kText: 'text-amber-400', label: 'OB' };
+  if (val <= 20) return { bar: 'from-violet-500 to-purple-600', kText: 'text-violet-400', label: 'XOS' };
+  if (val <= 30) return { bar: 'from-blue-500 to-indigo-500', kText: 'text-blue-400', label: 'OS' };
+  return { bar: 'from-slate-600 to-slate-500', kText: 'text-slate-500', label: 'NEU' };
 };
 
 const LiveClock: React.FC = () => {
@@ -130,7 +134,7 @@ export const ExchangeScanner: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </span>
-          <h2 className="text-sm font-semibold text-white">Live RSI Scanner</h2>
+          <h2 className="text-sm font-semibold text-white">Live StochRSI Scanner</h2>
           <LiveClock />
         </div>
         <span className="text-[11px] text-slate-600">Auto-refresh every 5s</span>
@@ -152,23 +156,25 @@ export const ExchangeScanner: React.FC = () => {
             syms = syms.filter((s) => s.symbol.toLowerCase().includes(q));
           }
           if (rsiZoneFilter !== 'ALL') {
-            syms = syms.filter(({ rsi5m, rsi15m, rsi4h }) => {
-              const rsis = [rsi5m, rsi15m, rsi4h];
-              if (rsiZoneFilter === 'XOB') return rsis.some((r) => r >= 80);
-              if (rsiZoneFilter === 'OB')  return rsis.some((r) => r >= 70);
-              if (rsiZoneFilter === 'OS')  return rsis.some((r) => r <= 30);
-              if (rsiZoneFilter === 'XOS') return rsis.some((r) => r <= 20);
+            // Zone filter uses %K values (more reactive)
+            syms = syms.filter(({ k5m, k15m, k4h }) => {
+              const ks = [k5m, k15m, k4h];
+              if (rsiZoneFilter === 'XOB') return ks.some((k) => k >= 80);
+              if (rsiZoneFilter === 'OB')  return ks.some((k) => k >= 70);
+              if (rsiZoneFilter === 'OS')  return ks.some((k) => k <= 30);
+              if (rsiZoneFilter === 'XOS') return ks.some((k) => k <= 20);
               return true;
             });
           }
           syms.sort((a, b) => {
             let res = 0;
-            if (sortBy === '5M')  res = b.rsi5m - a.rsi5m;
-            else if (sortBy === '15M') res = b.rsi15m - a.rsi15m;
-            else if (sortBy === '4H')  res = b.rsi4h - a.rsi4h;
+            if (sortBy === '5M')  res = b.k5m - a.k5m;
+            else if (sortBy === '15M') res = b.k15m - a.k15m;
+            else if (sortBy === '4H')  res = b.k4h - a.k4h;
             else if (sortBy === 'SYMBOL') res = a.symbol.localeCompare(b.symbol);
             else {
-              const ext = (s: SymbolDetail) => Math.max(Math.abs(s.rsi5m - 50), Math.abs(s.rsi15m - 50), Math.abs(s.rsi4h - 50));
+              // ZONE: sort by most extreme %K from 50
+              const ext = (s: SymbolDetail) => Math.max(Math.abs(s.k5m - 50), Math.abs(s.k15m - 50), Math.abs(s.k4h - 50));
               res = ext(b) - ext(a);
             }
             return sortDirection === 'asc' ? -res : res;
@@ -264,26 +270,28 @@ export const ExchangeScanner: React.FC = () => {
                           </span>
                         </div>
 
-                        {/* RSI mini bars */}
+                        {/* StochRSI mini bars — %K bar + K/D values */}
                         <div className="grid grid-cols-3 gap-1.5">
                           {[
-                            { label: '5m', val: item.rsi5m },
-                            { label: '15m', val: item.rsi15m },
-                            { label: '4h', val: item.rsi4h },
-                          ].map(({ label, val }) => {
-                            const meta = getRsiMeta(val);
+                            { label: '5m', k: item.k5m, d: item.d5m },
+                            { label: '15m', k: item.k15m, d: item.d15m },
+                            { label: '4h', k: item.k4h, d: item.d4h },
+                          ].map(({ label, k, d }) => {
+                            const meta = getStochMeta(k);
                             return (
                               <div key={label} className="flex flex-col gap-0.5">
                                 <div className="flex items-center justify-between">
                                   <span className="text-[9px] text-slate-300">{label}</span>
-                                  <span className={`text-[10px] font-mono font-bold ${meta.text}`}>{val.toFixed(1)}</span>
+                                  <span className={`text-[10px] font-mono font-bold ${meta.kText}`}>{k.toFixed(1)}</span>
                                 </div>
                                 <div className="h-1 w-full overflow-hidden rounded-full bg-slate-800/60">
                                   <div
                                     className={`h-full rounded-full bg-gradient-to-r ${meta.bar} transition-all`}
-                                    style={{ width: `${Math.min(100, val)}%` }}
+                                    style={{ width: `${Math.min(100, k)}%` }}
                                   />
                                 </div>
+                                {/* %D shown below in smaller font */}
+                                <span className="text-[9px] font-mono text-slate-500 text-right">D:{d.toFixed(1)}</span>
                               </div>
                             );
                           })}

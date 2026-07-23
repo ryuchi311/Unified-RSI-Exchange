@@ -45,8 +45,8 @@ export const Header: React.FC = () => {
               </svg>
             </div>
             <div>
-              <h1 className="text-base font-bold tracking-tight text-white sm:text-lg">Unified RSI Exchange</h1>
-              <p className="hidden text-[11px] text-slate-500 sm:block">Real-time multi-exchange RSI momentum tracker</p>
+              <h1 className="text-base font-bold tracking-tight text-white sm:text-lg">Unified RSI Stochastic</h1>
+              <p className="hidden text-[11px] text-slate-500 sm:block">Real-time multi-exchange RSI Stochastic momentum tracker</p>
             </div>
           </div>
         </div>

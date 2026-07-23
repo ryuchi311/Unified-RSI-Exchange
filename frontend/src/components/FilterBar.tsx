@@ -18,9 +18,9 @@ export const FilterBar: React.FC = () => {
 
   const sorts = [
     { label: 'Zone', value: 'ZONE' },
-    { label: '5m', value: '5M' },
-    { label: '15m', value: '15M' },
-    { label: '4h', value: '4H' },
+    { label: '5m K', value: '5M' },
+    { label: '15m K', value: '15M' },
+    { label: '4h K', value: '4H' },
     { label: 'Symbol', value: 'SYMBOL' },
   ] as const;
 

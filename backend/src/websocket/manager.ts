@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
-import type { Exchange, Candle, RSIValues } from '../types/shared.js';
+import type { Exchange, Candle, StochRSIValues } from '../types/shared.js';
 import { ExchangeService } from '../services/ExchangeService.js';
-import { calculateRSI } from '../utils/rsi.js';
+import { calculateStochRSI } from '../utils/rsi.js';
 import { AlertDetector } from '../services/AlertDetector.js';
 import { logger } from '../utils/logger.js';
 
@@ -173,11 +173,11 @@ export class WebSocketManager {
     // Add candle to appropriate buffer
     if (interval === '5m') {
       buffer.candles5m.push(candle);
-      if (buffer.candles5m.length > 100) buffer.candles5m.shift(); // Keep last 100
+      if (buffer.candles5m.length > 200) buffer.candles5m.shift(); // Keep last 200
       buffer.lastUpdate5m = Date.now();
     } else if (interval === '15m') {
       buffer.candles15m.push(candle);
-      if (buffer.candles15m.length > 100) buffer.candles15m.shift(); // Keep last 100
+      if (buffer.candles15m.length > 200) buffer.candles15m.shift(); // Keep last 200
       buffer.lastUpdate15m = Date.now();
     }
 
@@ -194,22 +194,22 @@ export class WebSocketManager {
     buffer: KlineBuffer,
     currentCandle: Candle
   ): void {
-    if (buffer.candles5m.length < 15 || buffer.candles15m.length < 15) {
-      return; // Need at least 15 candles for RSI
+    if (buffer.candles5m.length < 50 || buffer.candles15m.length < 50) {
+      return; // Need enough candles for StochRSI calculation
     }
 
     const closes5m = buffer.candles5m.map(c => c.close);
     const closes15m = buffer.candles15m.map(c => c.close);
 
-    const rsi5m = calculateRSI(closes5m, 14);
-    const rsi15m = calculateRSI(closes15m, 14);
+    const stoch5m = calculateStochRSI(closes5m);
+    const stoch15m = calculateStochRSI(closes15m);
 
-    if (rsi5m !== null && rsi15m !== null) {
+    if (stoch5m !== null && stoch15m !== null) {
       this.alertDetector.checkAndEmitAlert(
         exchange,
         symbol,
-        rsi5m,
-        rsi15m,
+        stoch5m,
+        stoch15m,
         currentCandle.close,
         Date.now(),
         buffer.candles5m[buffer.candles5m.length - 1].timestamp,

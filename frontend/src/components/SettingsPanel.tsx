@@ -189,7 +189,7 @@ export const SettingsPanel: React.FC = () => {
             </div>
 
             <div className="bg-white/[0.03] p-3.5 rounded-xl border border-white/[0.05] space-y-3">
-              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wide">RSI Alert Thresholds</div>
+              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wide">StochRSI Alert Thresholds</div>
               
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -232,6 +232,58 @@ export const SettingsPanel: React.FC = () => {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* StochRSI Calculation Parameters */}
+            <div className="bg-white/[0.03] p-3.5 rounded-xl border border-white/[0.05] space-y-3">
+              <div className="text-xs font-semibold text-slate-300 uppercase tracking-wide">StochRSI Parameters</div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-slate-400 text-xs mb-1">RSI Period</div>
+                  <input
+                    type="number"
+                    min="2" max="50"
+                    className="w-full bg-[#131b2f] border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-1 focus:ring-violet-500 font-mono"
+                    value={localSettings.stochRsiRsiPeriod}
+                    onChange={(e) => setLocalSettings({...localSettings, stochRsiRsiPeriod: parseInt(e.target.value)})}
+                  />
+                </div>
+                <div>
+                  <div className="text-slate-400 text-xs mb-1">Stoch Period</div>
+                  <input
+                    type="number"
+                    min="2" max="50"
+                    className="w-full bg-[#131b2f] border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-1 focus:ring-violet-500 font-mono"
+                    value={localSettings.stochRsiStochPeriod}
+                    onChange={(e) => setLocalSettings({...localSettings, stochRsiStochPeriod: parseInt(e.target.value)})}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-slate-400 text-xs mb-1">%K Smoothing</div>
+                  <input
+                    type="number"
+                    min="1" max="20"
+                    className="w-full bg-[#131b2f] border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-1 focus:ring-violet-500 font-mono"
+                    value={localSettings.stochRsiKPeriod}
+                    onChange={(e) => setLocalSettings({...localSettings, stochRsiKPeriod: parseInt(e.target.value)})}
+                  />
+                </div>
+                <div>
+                  <div className="text-slate-400 text-xs mb-1">%D Smoothing</div>
+                  <input
+                    type="number"
+                    min="1" max="20"
+                    className="w-full bg-[#131b2f] border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-1 focus:ring-violet-500 font-mono"
+                    value={localSettings.stochRsiDPeriod}
+                    onChange={(e) => setLocalSettings({...localSettings, stochRsiDPeriod: parseInt(e.target.value)})}
+                  />
+                </div>
+              </div>
+              <div className="text-[10px] text-slate-500">Standard TradingView defaults: 14 / 14 / 3 / 3</div>
             </div>
           </section>
 
@@ -316,15 +368,19 @@ export const SettingsPanel: React.FC = () => {
                 
                 {/* Example 1: Oversold */}
                 <div className="bg-[#0b101d] border border-emerald-500/30 rounded-lg p-2.5 font-mono text-[11px] leading-relaxed text-slate-200 shadow-inner">
-                  <div className="text-emerald-400 font-bold">⬇️ BingX ST · RSI OS</div>
-                  <div>🟩 5m 10.5 &nbsp;|&nbsp; 🟩 15m 18.9 &nbsp;|&nbsp; 🟪 4h 26.1</div>
+                  <div className="text-emerald-400 font-bold">⬇️ BingX ST · StochRSI OS</div>
+                  <div>🟩 5m  K:10.5 D:12.1</div>
+                  <div>🟩 15m K:18.9 D:20.3</div>
+                  <div>🟪 4h  K:26.1 D:28.4</div>
                   <div className="text-slate-400 text-[10px]">Extended down move · <span className="text-cyan-400 underline cursor-pointer">TradingView</span></div>
                 </div>
 
                 {/* Example 2: Extreme Overbought */}
                 <div className="bg-[#0b101d] border border-rose-500/30 rounded-lg p-2.5 font-mono text-[11px] leading-relaxed text-slate-200 shadow-inner">
-                  <div className="text-rose-400 font-bold">⬆️ BingX BROCCOLIF3B · RSI XOB</div>
-                  <div>🟥 5m 94.0 &nbsp;|&nbsp; 🟥 15m 93.1 &nbsp;|&nbsp; 🟪 4h 67.2</div>
+                  <div className="text-rose-400 font-bold">⬆️ BingX BROCCOLIF3B · StochRSI XOB</div>
+                  <div>🟥 5m  K:94.0 D:92.5</div>
+                  <div>🟥 15m K:93.1 D:91.8</div>
+                  <div>🟪 4h  K:67.2 D:65.4</div>
                   <div className="text-slate-400 text-[10px]">Extended up move · <span className="text-cyan-400 underline cursor-pointer">TradingView</span></div>
                 </div>
               </div>

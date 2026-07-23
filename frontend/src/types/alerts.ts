@@ -10,8 +10,13 @@ export interface Alert {
   exchange: Exchange;
   symbol: string;
   alertType: AlertType;
-  rsi5m: number;
-  rsi15m: number;
+  // StochRSI %K and %D lines per timeframe
+  k5m: number;
+  d5m: number;
+  k15m: number;
+  d15m: number;
+  k4h?: number;
+  d4h?: number;
   price: number;
   timestamp: number;
   candle5mTime: number;

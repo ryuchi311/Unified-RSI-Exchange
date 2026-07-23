@@ -14,6 +14,11 @@ export interface BackendSettings {
   tier1Oversold: number;
   tier2Overbought: number;
   tier2Oversold: number;
+  // StochRSI calculation parameters
+  stochRsiRsiPeriod: number;
+  stochRsiStochPeriod: number;
+  stochRsiKPeriod: number;
+  stochRsiDPeriod: number;
   telegramBotToken: string;
   telegramDestinations: TelegramDestination[];
 }
@@ -24,6 +29,10 @@ export const DEFAULT_BACKEND_SETTINGS: BackendSettings = {
   tier1Oversold: 20,
   tier2Overbought: 90,
   tier2Oversold: 10,
+  stochRsiRsiPeriod: 14,
+  stochRsiStochPeriod: 14,
+  stochRsiKPeriod: 3,
+  stochRsiDPeriod: 3,
   telegramBotToken: '',
   telegramDestinations: [],
 };

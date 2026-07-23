@@ -58,7 +58,7 @@ export const AlertFeed: React.FC = () => {
             </div>
             <div>
               <p className="text-xs font-medium text-slate-500">No alerts yet</p>
-              <p className="mt-0.5 text-[11px] text-slate-600">Start scanning to detect RSI signals</p>
+              <p className="mt-0.5 text-[11px] text-slate-600">Start scanning to detect StochRSI signals</p>
             </div>
           </div>
         ) : (
@@ -81,13 +81,28 @@ export const AlertFeed: React.FC = () => {
                     </div>
                     <span className="shrink-0 text-[10px] text-slate-200 font-medium">{formatTime(alert.timestamp)}</span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-1.5">
                     <span className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ring-1 ${meta.bg} ${meta.color} ${meta.ring}`}>
                       {meta.label}
                     </span>
-                    <div className="flex items-center gap-2 text-[10px] text-slate-300">
-                      <span>5m <span className="font-mono text-white font-bold">{alert.rsi5m.toFixed(1)}</span></span>
-                      <span>15m <span className="font-mono text-white font-bold">{alert.rsi15m.toFixed(1)}</span></span>
+                    <span className="text-[10px] font-mono text-slate-400">StochRSI</span>
+                  </div>
+                  {/* K/D values per timeframe */}
+                  <div className="grid grid-cols-3 gap-1 mt-1">
+                    <div className="flex flex-col gap-0.5 bg-white/[0.02] rounded px-1.5 py-1">
+                      <span className="text-[9px] text-slate-500 font-medium">5m</span>
+                      <span className="text-[10px] font-mono text-white font-bold">K {alert.k5m.toFixed(1)}</span>
+                      <span className="text-[10px] font-mono text-slate-400">D {alert.d5m.toFixed(1)}</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5 bg-white/[0.02] rounded px-1.5 py-1">
+                      <span className="text-[9px] text-slate-500 font-medium">15m</span>
+                      <span className="text-[10px] font-mono text-white font-bold">K {alert.k15m.toFixed(1)}</span>
+                      <span className="text-[10px] font-mono text-slate-400">D {alert.d15m.toFixed(1)}</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5 bg-white/[0.02] rounded px-1.5 py-1">
+                      <span className="text-[9px] text-slate-500 font-medium">4h</span>
+                      <span className="text-[10px] font-mono text-white font-bold">K {alert.k4h?.toFixed(1) ?? '—'}</span>
+                      <span className="text-[10px] font-mono text-slate-400">D {alert.d4h?.toFixed(1) ?? '—'}</span>
                     </div>
                   </div>
                 </button>
