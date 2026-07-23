@@ -59,7 +59,22 @@ const getRsiMeta = (val: number) => {
   if (val >= 70) return { bar: 'from-amber-500 to-orange-500', text: 'text-amber-400', label: 'OB' };
   if (val <= 20) return { bar: 'from-violet-500 to-purple-600', text: 'text-violet-400', label: 'XOS' };
   if (val <= 30) return { bar: 'from-blue-500 to-indigo-500', text: 'text-blue-400', label: 'OS' };
-  return { bar: 'from-slate-600 to-slate-700', text: 'text-slate-400', label: '' };
+  return { bar: 'from-slate-600 to-slate-500', text: 'text-slate-500', label: 'NEU' };
+};
+
+const LiveClock: React.FC = () => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <span className="ml-2 rounded-md bg-white/[0.03] px-2 py-0.5 text-[11px] font-mono font-medium text-slate-400 ring-1 ring-white/[0.05]">
+      {time.toLocaleTimeString([], { hour12: false })}
+    </span>
+  );
 };
 
 export const ExchangeScanner: React.FC = () => {
@@ -116,6 +131,7 @@ export const ExchangeScanner: React.FC = () => {
             </svg>
           </span>
           <h2 className="text-sm font-semibold text-white">Live RSI Scanner</h2>
+          <LiveClock />
         </div>
         <span className="text-[11px] text-slate-600">Auto-refresh every 5s</span>
       </div>
@@ -169,7 +185,7 @@ export const ExchangeScanner: React.FC = () => {
                   <span className={`rounded-md px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider ring-1 ${theme.badge}`}>
                     {exchange}
                   </span>
-                  <span className="text-[11px] text-slate-500">{syms.length} / {exStatus?.symbols ?? 0} pairs</span>
+                  <span className="text-[11px] text-slate-200">{syms.length} / {exStatus?.symbols ?? 0} pairs</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {/* Status dot */}
@@ -202,7 +218,7 @@ export const ExchangeScanner: React.FC = () => {
               {/* Scan progress bar */}
               {exStatus?.scanning && (
                 <div className="border-b border-white/[0.04] px-3 py-1.5">
-                  <div className="flex items-center justify-between text-[10px] text-slate-600 mb-1">
+                  <div className="flex items-center justify-between text-[10px] text-slate-200 mb-1">
                     <span>Scanning…</span>
                     <span className="font-mono">{scanned}/{total} ({pct.toFixed(0)}%)</span>
                   </div>
@@ -237,8 +253,13 @@ export const ExchangeScanner: React.FC = () => {
                       >
                         {/* Symbol row */}
                         <div className="mb-2 flex items-center justify-between">
-                          <span className={`text-xs font-bold ${theme.accent}`}>{item.symbol}</span>
-                          <span className="font-mono text-[11px] text-slate-400">
+                          <div className="flex items-center gap-2">
+                            <span className={`text-xs font-bold ${theme.accent}`}>{item.symbol}</span>
+                            <span className="text-[10px] text-slate-300 font-medium">
+                              {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                            </span>
+                          </div>
+                          <span className="font-mono text-[11px] text-slate-200 font-medium">
                             ${item.price < 1 ? item.price.toFixed(5) : item.price.toFixed(2)}
                           </span>
                         </div>
@@ -254,7 +275,7 @@ export const ExchangeScanner: React.FC = () => {
                             return (
                               <div key={label} className="flex flex-col gap-0.5">
                                 <div className="flex items-center justify-between">
-                                  <span className="text-[9px] text-slate-600">{label}</span>
+                                  <span className="text-[9px] text-slate-300">{label}</span>
                                   <span className={`text-[10px] font-mono font-bold ${meta.text}`}>{val.toFixed(1)}</span>
                                 </div>
                                 <div className="h-1 w-full overflow-hidden rounded-full bg-slate-800/60">
