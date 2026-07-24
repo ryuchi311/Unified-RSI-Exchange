@@ -3,6 +3,7 @@ import { generateId } from '../utils/helpers.js';
 import { logger } from '../utils/logger.js';
 import type { SettingsManager } from './SettingsManager.js';
 import type { TelegramService } from './TelegramService.js';
+import type { DiscordService } from './DiscordService.js';
 
 interface AlertState {
   lastAlertTime: Map<string, number>; // key: `${symbol}-${alertType}`
@@ -14,14 +15,17 @@ export class AlertDetector {
   private listeners: ((alert: Alert) => void)[] = [];
   private settingsManager: SettingsManager;
   private telegramService: TelegramService;
+  private discordService: DiscordService;
 
   constructor(
     settingsManager: SettingsManager, 
     telegramService: TelegramService,
+    discordService: DiscordService,
     dedupWindow: number = 300000 // 5 minutes default
   ) { 
     this.settingsManager = settingsManager;
     this.telegramService = telegramService;
+    this.discordService = discordService;
     this.alertState = {
       lastAlertTime: new Map(),
       dedupWindow,
@@ -101,6 +105,11 @@ export class AlertDetector {
     // Dispatch to Telegram asynchronously
     this.telegramService.sendAlert(alert).catch(err => {
       logger.error('Error dispatching telegram alert', err);
+    });
+
+    // Dispatch to Discord asynchronously
+    this.discordService.sendAlert(alert).catch(err => {
+      logger.error('Error dispatching discord alert', err);
     });
 
     return alert;

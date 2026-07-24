@@ -72,6 +72,32 @@ export const SettingsPanel: React.FC = () => {
     });
   };
 
+  const addDiscordDest = () => {
+    setLocalSettings({
+      ...localSettings,
+      discordDestinations: [
+        ...localSettings.discordDestinations,
+        { id: Math.random().toString(), webhookUrl: '', name: '' },
+      ],
+    });
+  };
+
+  const removeDiscordDest = (id: string) => {
+    setLocalSettings({
+      ...localSettings,
+      discordDestinations: localSettings.discordDestinations.filter((d) => d.id !== id),
+    });
+  };
+
+  const updateDiscordDest = (id: string, field: 'webhookUrl' | 'name', value: string) => {
+    setLocalSettings({
+      ...localSettings,
+      discordDestinations: localSettings.discordDestinations.map((d) =>
+        d.id === id ? { ...d, [field]: value } : d
+      ),
+    });
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex justify-end">
       {/* Backdrop overlay */}
@@ -327,6 +353,69 @@ export const SettingsPanel: React.FC = () => {
                   <div>🟥 5m 94.0 &nbsp;|&nbsp; 🟥 15m 93.1 &nbsp;|&nbsp; 🟪 4h 67.2</div>
                   <div className="text-slate-400 text-[10px]">Extended up move · <span className="text-cyan-400 underline cursor-pointer">TradingView</span></div>
                 </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Discord Integration */}
+          <section className="space-y-4">
+            <h3 className="text-xs font-bold text-[#5865F2] uppercase tracking-wider flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#5865F2]"></span>
+              Discord Webhooks
+            </h3>
+            
+            <div className="bg-white/[0.03] p-3.5 rounded-xl border border-white/[0.05] space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="text-slate-300 font-medium text-xs">Webhook Destinations</div>
+                  <button 
+                    onClick={addDiscordDest}
+                    className="text-xs bg-[#5865F2]/20 text-[#5865F2] px-2.5 py-1 rounded-lg border border-[#5865F2]/30 hover:bg-[#5865F2]/30 transition-colors font-medium"
+                  >
+                    + Add Webhook
+                  </button>
+                </div>
+
+                {localSettings.discordDestinations.length === 0 && (
+                  <div className="text-xs text-slate-500 text-center py-3 bg-slate-900/40 rounded-lg border border-slate-800/60">
+                    No Discord webhooks added.
+                  </div>
+                )}
+
+                {localSettings.discordDestinations.map((dest) => (
+                  <div key={dest.id} className="bg-[#131b2f] border border-white/10 rounded-lg p-3 space-y-2 relative group">
+                    <button 
+                      onClick={() => removeDiscordDest(dest.id)}
+                      className="absolute top-2.5 right-2.5 text-slate-500 hover:text-rose-400 transition-colors p-1"
+                      title="Remove"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    
+                    <div>
+                      <div className="text-[11px] text-slate-400 mb-1">Webhook Name (Optional)</div>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. Alerts Channel"
+                        className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-white text-xs font-mono focus:outline-none focus:border-[#5865F2]"
+                        value={dest.name || ''}
+                        onChange={(e) => updateDiscordDest(dest.id, 'name', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-slate-400 mb-1">Webhook URL</div>
+                      <input 
+                        type="password" 
+                        placeholder="https://discord.com/api/webhooks/..."
+                        className="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-white text-xs font-mono focus:outline-none focus:border-[#5865F2]"
+                        value={dest.webhookUrl || ''}
+                        onChange={(e) => updateDiscordDest(dest.id, 'webhookUrl', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </section>

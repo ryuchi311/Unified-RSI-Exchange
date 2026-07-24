@@ -11,6 +11,7 @@ import { logger } from './utils/logger.js';
 import type { Exchange } from './types/shared.js';
 import { SettingsManager } from './services/SettingsManager.js';
 import { TelegramService } from './services/TelegramService.js';
+import { DiscordService } from './services/DiscordService.js';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ async function main() {
   const settingsManager = new SettingsManager();
   await settingsManager.initialize();
   const telegramService = new TelegramService(settingsManager);
+  const discordService = new DiscordService(settingsManager);
 
   // Initialize exchange services
   const exchanges = new Map<Exchange, any>([
@@ -35,7 +37,7 @@ async function main() {
 
   // Initialize services
   const symbolManager = new SymbolManager(exchanges, SYMBOL_REFRESH_INTERVAL);
-  const alertDetector = new AlertDetector(settingsManager, telegramService, ALERT_DEDUP_WINDOW);
+  const alertDetector = new AlertDetector(settingsManager, telegramService, discordService, ALERT_DEDUP_WINDOW);
   const wsManager = new WebSocketManager(exchanges, alertDetector);
   const restPoller = new RestPoller(exchanges, alertDetector, symbolManager, settingsManager);
   const apiServer = new APIServer(alertDetector, symbolManager, wsManager, restPoller, settingsManager);

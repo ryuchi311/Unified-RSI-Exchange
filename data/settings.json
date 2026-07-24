@@ -11,5 +11,12 @@
       "chatId": "-5079016681",
       "topicId": ""
     }
+  ],
+  "discordDestinations": [
+    {
+      "id": "0.969167418977358",
+      "webhookUrl": "https://discord.com/api/webhooks/1530293293999591445/ds4cnOLbmZPryadMKjLvEK_r31wuN6UQao0pTtsSJTZ6das1r5_5lP4p9YhQ423Y4TN9",
+      "name": "Trading Xsignals"
+    }
   ]
 }

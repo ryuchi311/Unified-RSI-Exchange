@@ -13,6 +13,12 @@ export interface TelegramDestination {
   topicId?: string; // Optional thread ID
 }
 
+export interface DiscordDestination {
+  id: string;
+  webhookUrl: string;
+  name?: string;
+}
+
 export interface BackendSettings {
   maxScanPairs: number;
   tier1Overbought: number;
@@ -21,6 +27,7 @@ export interface BackendSettings {
   tier2Oversold: number;
   telegramBotToken: string;
   telegramDestinations: TelegramDestination[];
+  discordDestinations: DiscordDestination[];
 }
 
 const DEFAULT_SETTINGS: BackendSettings = {
@@ -31,6 +38,7 @@ const DEFAULT_SETTINGS: BackendSettings = {
   tier2Oversold: 10,
   telegramBotToken: '',
   telegramDestinations: [],
+  discordDestinations: [],
 };
 
 export class SettingsManager {
