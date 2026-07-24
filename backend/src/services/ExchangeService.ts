@@ -50,15 +50,17 @@ export abstract class ExchangeService {
    * Respect rate limits
    */
   protected async respectRateLimit(): Promise<void> {
-    const now = Date.now();
-    const timeSinceLastRequest = now - this.lastRequestTime;
     const minInterval = 1000 / this.rateLimit;
+    const now = Date.now();
+    let nextAvailableTime = this.lastRequestTime + minInterval;
 
-    if (timeSinceLastRequest < minInterval) {
-      await new Promise(resolve => setTimeout(resolve, minInterval - timeSinceLastRequest));
+    if (now >= nextAvailableTime) {
+      this.lastRequestTime = now;
+      return;
     }
 
-    this.lastRequestTime = Date.now();
+    this.lastRequestTime = nextAvailableTime;
+    await new Promise(resolve => setTimeout(resolve, nextAvailableTime - now));
   }
 
   /**

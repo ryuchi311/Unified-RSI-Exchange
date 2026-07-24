@@ -6,21 +6,31 @@ Your multi-exchange RSI scanner is fully configured and ready to run.
 
 ---
 
-## 🎯 Quick Start (Choose Your Method)
+## 🎯 Quick Start
 
-### **Windows PowerShell** (Recommended)
+### 👶 **Absolute Beginner (Zero Knowledge)**
+1. Ensure you have installed **Node.js** (See `REQUIREMENTS.md` if you haven't).
+2. Open the `Unified-RSI-Exchange` folder.
+3. Double-click the file named **`start.bat`** (it might just say `start` and have a gear/window icon).
+4. A black window will open. Wait a few minutes for it to install everything and start!
+
+---
+
+### 👨‍💻 **Advanced Users (Terminal Methods)**
+
+**Windows PowerShell**
 ```powershell
 cd c:\Unified-RSI-Exchange
 .\start.ps1
 ```
 
-### **Windows Command Prompt**
+**Windows Command Prompt**
 ```cmd
 cd c:\Unified-RSI-Exchange
 start.bat
 ```
 
-### **macOS / Linux**
+**macOS / Linux**
 ```bash
 cd ~/Unified-RSI-Exchange
 chmod +x start.sh

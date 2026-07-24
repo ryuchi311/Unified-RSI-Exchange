@@ -16,6 +16,7 @@ export class RestPoller {
   private settingsManager: SettingsManager;
   private timers: Map<Exchange, NodeJS.Timeout> = new Map();
   private scanning: Set<Exchange> = new Set();
+  private scanGenerations: Map<Exchange, number> = new Map();
   private scanProgress: Map<Exchange, { scanned: number; total: number }> = new Map();
   private latestScanData: Map<Exchange, Map<string, { rsi5m: number; rsi15m: number; rsi4h: number; price: number; timestamp: number }>> = new Map();
 
@@ -38,10 +39,16 @@ export class RestPoller {
 
     logger.info(`[RestPoller] Starting REST poll for ${exchange}`);
     this.scanning.add(exchange);
+    const generation = (this.scanGenerations.get(exchange) || 0) + 1;
+    this.scanGenerations.set(exchange, generation);
 
     // Run immediately, then on interval
-    this.poll(exchange, service);
-    const timer = setInterval(() => this.poll(exchange, service!), POLL_INTERVAL_MS);
+    this.poll(exchange, service, generation);
+    const timer = setInterval(() => {
+      const currentGen = (this.scanGenerations.get(exchange) || 0) + 1;
+      this.scanGenerations.set(exchange, currentGen);
+      this.poll(exchange, service!, currentGen);
+    }, POLL_INTERVAL_MS);
     this.timers.set(exchange, timer);
   }
 
@@ -62,6 +69,7 @@ export class RestPoller {
     for (const exchange of active) {
       logger.info(`[RestPoller] Restarting scan for ${exchange} due to settings change`);
       this.stop(exchange);
+      this.latestScanData.delete(exchange);
       this.start(exchange);
     }
   }
@@ -74,7 +82,7 @@ export class RestPoller {
     return this.scanProgress.get(exchange) || { scanned: 0, total: 0 };
   }
 
-  private async poll(exchange: Exchange, service: ExchangeService): Promise<void> {
+  private async poll(exchange: Exchange, service: ExchangeService, generation: number): Promise<void> {
     const allSymbols = this.symbolManager.getSymbols(exchange);
     if (allSymbols.length === 0) {
       logger.warn(`[RestPoller] No symbols for ${exchange}, skipping poll`);
@@ -93,6 +101,10 @@ export class RestPoller {
     let errorCount = 0;
 
     for (let idx = 0; idx < symbols.length; idx++) {
+      if (this.scanGenerations.get(exchange) !== generation || !this.scanning.has(exchange)) {
+        logger.info(`[RestPoller] Aborting old poll loop for ${exchange}`);
+        return;
+      }
       const symbol = symbols[idx];
       try {
         const [candles5m, candles15m, candles4h] = await Promise.all([
@@ -156,6 +168,11 @@ export class RestPoller {
 
       // Small delay between symbols to respect rate limits
       await new Promise(r => setTimeout(r, 50));
+      
+      if (this.scanGenerations.get(exchange) !== generation || !this.scanning.has(exchange)) {
+        logger.info(`[RestPoller] Aborting old poll loop for ${exchange} during delay`);
+        return;
+      }
     }
 
     logger.info(`[RestPoller] Finished poll for ${exchange}: ${successCount} success, ${errorCount} errors`);

@@ -1,14 +1,33 @@
 # System Requirements
 
+## 👶 Absolute Beginner Guide (For Brand New PC/Laptop)
+If you have zero technical knowledge and just bought a new computer, follow these exact steps before doing anything else:
+
+**1. Install Node.js (The engine that runs this app)**
+- Go to [https://nodejs.org/](https://nodejs.org/) in your web browser.
+- Click the button that says **"LTS"** (Recommended for Most Users) to download it.
+- Open the downloaded file and click "Next" through the entire installation (leave all settings as default).
+
+**2. Extract the Project Files**
+- If you received a `.rar` or `.zip` file, you need to extract it.
+- If you can't open `.rar` files, download and install [7-Zip](https://www.7-zip.org/) or [WinRAR](https://www.rarlab.com/download.htm).
+- Right-click the `Unified-RSI-Exchange.rar` file and select "Extract Here" or "Extract to Unified-RSI-Exchange/".
+
+**3. Open the Project Folder**
+- Open the extracted `Unified-RSI-Exchange` folder.
+- You are now ready! Go to the `START_HERE.md` file or simply double-click the `start.bat` or `start.ps1` file to begin.
+
+---
+
 ## Minimum Requirements
 
 ### Node.js & npm
 - **Node.js**: v18.0.0 or higher
 - **npm**: v9.0.0 or higher
 
-**Installation:**
+**Advanced Installation:**
 - Download from https://nodejs.org/
-- Verify installation: `node --version && npm --version`
+- Verify installation in terminal: `node --version && npm --version`
 
 ### Operating System
 - Windows 10+ (for .bat scripts) or PowerShell 5.0+
