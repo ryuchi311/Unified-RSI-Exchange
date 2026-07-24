@@ -14,11 +14,9 @@ export class DiscordService {
     const isOverbought = alert.alertType.includes('OVERBOUGHT');
     const isExtreme = alert.alertType.includes('TIER2');
 
-    let label = 'OS';
+    let label = 'OVERSOLD';
     if (isOverbought) {
-      label = isExtreme ? 'XOB' : 'OB';
-    } else {
-      label = isExtreme ? 'XOS' : 'OS';
+      label = 'OVERBOUGHT';
     }
 
     const cleanBase = alert.symbol
@@ -30,35 +28,20 @@ export class DiscordService {
     const rsi4hStr = alert.rsi4h !== undefined ? alert.rsi4h.toFixed(1) : 'N/A';
 
     const moveDirection = isOverbought ? 'Extended up move' : 'Extended down move';
-    const color = isOverbought ? 16711680 : 65280; // Red : Green
 
     const tvSymbol = `${alert.exchange.toUpperCase()}:${cleanBase}USDT.P`;
     const tvUrl = `https://www.tradingview.com/chart/?symbol=${tvSymbol}`;
+
+    const arrow = isOverbought ? '⬆️' : '⬇️';
+    const square = isOverbought ? '🟥' : '🟩';
+    const color = isOverbought ? 16711680 : 65280; // Red : Green
 
     return {
       content: null,
       embeds: [
         {
-          title: `${alert.exchange} ${cleanBase} · RSI ${label}`,
-          description: `${moveDirection} · [TradingView](${tvUrl})`,
           color: color,
-          fields: [
-            {
-              name: '5m RSI',
-              value: rsi5,
-              inline: true
-            },
-            {
-              name: '15m RSI',
-              value: rsi15,
-              inline: true
-            },
-            {
-              name: '4h RSI',
-              value: rsi4hStr,
-              inline: true
-            }
-          ],
+          description: `${arrow} ${alert.exchange} ${cleanBase}/USDT · RSI ${label}\n${square} 5m ${rsi5} | ${square} 15m ${rsi15} | 🟪 4h ${rsi4hStr}\n*${moveDirection}* · [TradingView](${tvUrl})`,
           timestamp: new Date(alert.timestamp).toISOString()
         }
       ]
