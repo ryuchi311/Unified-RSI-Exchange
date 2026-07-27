@@ -1,4 +1,4 @@
-export type Exchange = 'BingX' | 'MEXC' | 'Bitunix';
+export type Exchange = 'BingX' | 'MEXC' | 'Bitunix' | 'Bitget';
 export type AlertType =
   | 'OVERBOUGHT_TIER1'
   | 'OVERBOUGHT_TIER2'

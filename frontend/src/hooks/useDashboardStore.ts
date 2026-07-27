@@ -105,7 +105,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
   startAllScanning: () =>
     set({
-      scanningExchanges: new Set(['BingX', 'MEXC', 'Bitunix']),
+      scanningExchanges: new Set(['BingX', 'MEXC', 'Bitunix', 'Bitget']),
       isScanning: true,
     }),
 
