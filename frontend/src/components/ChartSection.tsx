@@ -129,7 +129,7 @@ export const ChartSection: React.FC = () => {
             width="100%"
             height="100%"
             allow_symbol_change={false}
-            hide_side_toolbar={true}
+            hide_side_toolbar={false}
             enable_publishing={false}
             studies={["RSI@tv-basicstudies"]}
           />
