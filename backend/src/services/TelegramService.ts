@@ -25,7 +25,7 @@ export class TelegramService {
 
     // Format symbol as just the BASE (e.g. ST, BROCCOLIF3B)
     const cleanBase = alert.symbol
-      .replace(/[-_]USDT$/i, '')
+      .replace(/[-_]?USDT(?:-SWAP)?$/i, '')
       .replace(/USDT$/i, '');
     // Indicators: 🟩 for oversold, 🟥 for overbought, 🟪 for 4h
     const square = isOverbought ? '🟥' : '🟩';

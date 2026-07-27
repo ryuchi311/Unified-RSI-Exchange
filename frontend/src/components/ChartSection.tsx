@@ -26,7 +26,7 @@ const EXCHANGE_STYLE: Record<string, { label: string; color: string; bg: string 
  */
 function buildTVSymbol(cleanSymbol: string, exchange: string): string {
   // cleanSymbol is always in BTCUSDT format (no separators)
-  const base = cleanSymbol.replace(/USDT$/i, '');
+  const base = cleanSymbol.replace(/USDT(?:SWAP)?$/i, '');
 
   switch (exchange) {
     case 'BingX':
@@ -71,7 +71,7 @@ export const ChartSection: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
             </svg>
           </div>
-          <span className="text-sm font-bold text-white">{cleanSymbol.replace('USDT', '')}</span>
+          <span className="text-sm font-bold text-white">{cleanSymbol.replace(/USDT(?:SWAP)?/i, '')}</span>
           <span className="text-slate-600">/</span>
           <span className="text-xs text-slate-500">USDT Perp</span>
         </div>
