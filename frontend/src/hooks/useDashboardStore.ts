@@ -8,6 +8,7 @@ export interface DashboardState {
   selectedTimeframes: string[];
   isScanning: boolean;
   scanningExchanges: Set<Exchange>;
+  visibleExchanges: Set<Exchange>;
   symbolSearch: string;
   rsiZoneFilter: 'ALL' | 'OB' | 'XOB' | 'OS' | 'XOS';
   sortBy: 'ZONE' | '5M' | '15M' | '4H' | 'SYMBOL';
@@ -27,6 +28,7 @@ export interface DashboardState {
   toggleAlertFilter: (alertType: AlertType) => void;
   toggleTimeframe: (timeframe: string) => void;
   toggleScanning: (exchange: Exchange) => void;
+  toggleVisibleExchange: (exchange: Exchange) => void;
   startAllScanning: () => void;
   stopAllScanning: () => void;
   setSymbolSearch: (search: string) => void;
@@ -44,12 +46,33 @@ export interface DashboardState {
   getFilteredAlerts: () => Alert[];
 }
 
+const loadVisibleExchanges = (): Set<Exchange> => {
+  try {
+    const item = localStorage.getItem('visibleExchanges');
+    if (item) {
+      return new Set(JSON.parse(item) as Exchange[]);
+    }
+  } catch (e) {
+    // ignore
+  }
+  return new Set(['BingX', 'MEXC', 'Bitunix', 'Bitget']);
+};
+
+const saveVisibleExchanges = (exchanges: Set<Exchange>) => {
+  try {
+    localStorage.setItem('visibleExchanges', JSON.stringify(Array.from(exchanges)));
+  } catch (e) {
+    // ignore
+  }
+};
+
 export const useDashboardStore = create<DashboardState>((set, get) => ({
   activeExchange: 'BingX',
   selectedAlertFilters: ['OVERBOUGHT_TIER1', 'OVERBOUGHT_TIER2', 'OVERSOLD_TIER1', 'OVERSOLD_TIER2'],
   selectedTimeframes: ['5m', '15m'],
   isScanning: false,
   scanningExchanges: new Set(),
+  visibleExchanges: loadVisibleExchanges(),
   symbolSearch: '',
   rsiZoneFilter: 'ALL',
   sortBy: '5M',
@@ -101,6 +124,18 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       scanning.add(exchange);
     }
     set({ scanningExchanges: scanning, isScanning: scanning.size > 0 });
+  },
+
+  toggleVisibleExchange: (exchange: Exchange) => {
+    const state = get();
+    const visible = new Set(state.visibleExchanges);
+    if (visible.has(exchange)) {
+      visible.delete(exchange);
+    } else {
+      visible.add(exchange);
+    }
+    saveVisibleExchanges(visible);
+    set({ visibleExchanges: visible });
   },
 
   startAllScanning: () =>

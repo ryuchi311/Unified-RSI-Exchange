@@ -91,6 +91,7 @@ export const ExchangeScanner: React.FC = () => {
   const {
     setSelectedSymbol, setActiveExchange,
     symbolSearch, rsiZoneFilter, sortBy, sortDirection,
+    visibleExchanges, toggleVisibleExchange, toggleScanning
   } = useDashboardStore();
 
   const [status, setStatus] = useState<ExchangeStatus[]>([]);
@@ -133,8 +134,8 @@ export const ExchangeScanner: React.FC = () => {
   return (
     <div>
       {/* Section header */}
-      <div className="mb-3 flex items-center justify-between px-1">
-        <div className="flex items-center gap-2">
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
+        <div className="flex flex-wrap items-center gap-2.5">
           <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/[0.05]">
             <svg className="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -142,13 +143,37 @@ export const ExchangeScanner: React.FC = () => {
           </span>
           <h2 className="text-sm font-semibold text-white">Live RSI Scanner</h2>
           <LiveClock />
+          
+          <div className="hidden h-4 w-px bg-white/10 sm:block" />
+
+          {/* Exchange Display Toggles */}
+          <div className="flex flex-wrap gap-1.5">
+            {EXCHANGES.map(ex => {
+              const isVisible = visibleExchanges.has(ex);
+              const theme = THEME[ex];
+              return (
+                <button
+                  key={`toggle-${ex}`}
+                  onClick={() => toggleVisibleExchange(ex)}
+                  className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all duration-200 border ${
+                    isVisible
+                      ? `bg-white/10 ${theme.accent} border-white/20 shadow-lg`
+                      : 'bg-white/5 text-slate-500 border-white/5 hover:bg-white/10 hover:text-slate-300'
+                  }`}
+                >
+                  <div className={`h-1.5 w-1.5 rounded-full ${isVisible ? theme.dot : 'bg-slate-600'}`} />
+                  {ex}
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <span className="text-[11px] text-slate-600">Auto-refresh every 5s</span>
+        <span className="hidden sm:inline text-[11px] text-slate-600 shrink-0">Auto-refresh every 5s</span>
       </div>
 
       {/* Dynamic grid layout */}
       <div className={`grid gap-3 ${expandedExchange ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
-        {EXCHANGES.filter(ex => !expandedExchange || ex === expandedExchange).map((exchange) => {
+        {EXCHANGES.filter(ex => visibleExchanges.has(ex)).filter(ex => !expandedExchange || ex === expandedExchange).map((exchange) => {
           const theme = THEME[exchange];
           const exStatus = status.find((s) => s.exchange === exchange);
           const scanned = exStatus?.scanned ?? 0;
@@ -198,13 +223,19 @@ export const ExchangeScanner: React.FC = () => {
                   <span className="text-[11px] text-slate-200">{syms.length} / {exStatus?.symbols ?? 0} pairs</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  {/* Status dot */}
-                  <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                    exStatus?.scanning ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/25' : 'bg-slate-800/60 text-slate-500'
-                  }`}>
+                  {/* Status dot / Pause Button */}
+                  <button
+                    onClick={() => toggleScanning(exchange)}
+                    className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+                      exStatus?.scanning
+                        ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/25 hover:bg-rose-500/10 hover:text-rose-400 hover:ring-rose-500/25'
+                        : 'bg-slate-800/60 text-slate-500 hover:bg-emerald-500/10 hover:text-emerald-400 hover:ring-1 hover:ring-emerald-500/25'
+                    }`}
+                    title={exStatus?.scanning ? `Pause ${exchange} scan` : `Resume ${exchange} scan`}
+                  >
                     <span className={`h-1.5 w-1.5 rounded-full ${exStatus?.scanning ? `${theme.dot} animate-pulse` : 'bg-slate-600'}`} />
-                    {exStatus?.scanning ? 'Live' : 'Idle'}
-                  </span>
+                    {exStatus?.scanning ? 'Live' : 'Paused'}
+                  </button>
 
                   {/* Expand / Collapse Button */}
                   <button
