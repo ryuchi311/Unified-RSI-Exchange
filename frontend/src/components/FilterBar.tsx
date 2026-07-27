@@ -28,20 +28,6 @@ export const FilterBar: React.FC = () => {
     <div className="px-3 pb-3 pt-1 sm:px-4">
       <div className="flex flex-wrap items-center gap-2">
 
-        {/* Search */}
-        <div className="relative min-w-[160px] flex-1 sm:max-w-[220px]">
-          <svg className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search symbol..."
-            value={symbolSearch}
-            onChange={(e) => setSymbolSearch(e.target.value)}
-            className="h-8 w-full rounded-lg border border-white/[0.08] bg-white/[0.04] pl-8 pr-3 text-xs text-slate-200 placeholder-slate-600 outline-none ring-0 transition focus:border-cyan-500/50 focus:bg-white/[0.07] focus:ring-1 focus:ring-cyan-500/20"
-          />
-        </div>
-
         {/* Zone filter pills */}
         <div className="flex items-center gap-1 rounded-lg border border-white/[0.06] bg-white/[0.03] p-0.5">
           {zones.map(({ label, value, emoji }) => (
@@ -77,6 +63,30 @@ export const FilterBar: React.FC = () => {
               )}
             </button>
           ))}
+        </div>
+
+        {/* Search */}
+        <div className="ml-auto relative min-w-[200px] flex-1 sm:max-w-[280px] group">
+          <svg className="absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search symbol..."
+            value={symbolSearch}
+            onChange={(e) => setSymbolSearch(e.target.value)}
+            className="h-8 w-full rounded-full border border-white/[0.15] bg-white/[0.05] shadow-inner pl-9 pr-8 text-[11.5px] font-medium text-slate-100 placeholder-slate-400 outline-none ring-0 transition-all duration-200 hover:border-white/[0.25] hover:bg-white/[0.08] focus:border-cyan-500/50 focus:bg-[#0c1322] focus:ring-2 focus:ring-cyan-500/20 focus:shadow-[0_0_10px_rgba(6,182,212,0.15)]"
+          />
+          {symbolSearch && (
+            <button
+              onClick={() => setSymbolSearch('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 flex h-4 w-4 items-center justify-center rounded-full bg-slate-700/50 text-slate-300 hover:bg-slate-600 hover:text-white transition-colors"
+            >
+              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
         </div>
 
       </div>
