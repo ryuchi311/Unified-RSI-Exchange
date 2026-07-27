@@ -183,6 +183,7 @@ export const SettingsPanel: React.FC = () => {
                 <option value="MEXC">MEXC Perpetual</option>
                 <option value="Bitunix">Bitunix Perpetual</option>
                 <option value="Bitget">Bitget Perpetual</option>
+                <option value="OKX">OKX Perpetual</option>
               </select>
             </div>
           </section>

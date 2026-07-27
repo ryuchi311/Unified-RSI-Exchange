@@ -55,7 +55,7 @@ const loadVisibleExchanges = (): Set<Exchange> => {
   } catch (e) {
     // ignore
   }
-  return new Set(['BingX', 'MEXC', 'Bitunix', 'Bitget']);
+  return new Set(['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX']);
 };
 
 const saveVisibleExchanges = (exchanges: Set<Exchange>) => {
@@ -140,7 +140,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
   startAllScanning: () =>
     set({
-      scanningExchanges: new Set(['BingX', 'MEXC', 'Bitunix', 'Bitget']),
+      scanningExchanges: new Set(['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX']),
       isScanning: true,
     }),
 
