@@ -14,6 +14,8 @@ const EXCHANGE_COLORS: Record<string, string> = {
   MEXC: 'text-teal-400',
   Bitunix: 'text-emerald-400',
   Bitget: 'text-blue-400',
+  OKX: 'text-zinc-100',
+  Binance: 'text-yellow-400',
 };
 
 const formatTime = (ts: number) =>

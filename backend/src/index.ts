@@ -4,6 +4,7 @@ import { MEXCService } from './services/MEXCService.js';
 import { BitunixService } from './services/BitunixService.js';
 import { BitgetService } from './services/BitgetService.js';
 import { OKXService } from './services/OKXService.js';
+import { BinanceService } from './services/BinanceService.js';
 import { SymbolManager } from './services/SymbolManager.js';
 import { WebSocketManager } from './websocket/manager.js';
 import { AlertDetector } from './services/AlertDetector.js';
@@ -37,6 +38,7 @@ async function main() {
     ['Bitunix', new BitunixService()],
     ['Bitget', new BitgetService()],
     ['OKX', new OKXService()],
+    ['Binance', new BinanceService()],
   ]);
 
   // Initialize services
@@ -58,7 +60,7 @@ async function main() {
 
     // Start REST polling for RSI scanning across all perpetual futures exchanges
     logger.info('Starting REST polling scanner...');
-    const pollableExchanges: Exchange[] = ['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX'];
+    const pollableExchanges: Exchange[] = ['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX', 'Binance'];
     for (const exchange of pollableExchanges) {
       restPoller.start(exchange);
     }

@@ -14,6 +14,7 @@ const EXCHANGE_STYLE: Record<string, { label: string; color: string; bg: string 
   Bitunix: { label: 'Bitunix', color: 'text-emerald-400', bg: 'bg-emerald-500/10 ring-emerald-500/30' },
   Bitget:  { label: 'Bitget',  color: 'text-blue-400',    bg: 'bg-blue-500/10 ring-blue-500/30' },
   OKX:     { label: 'OKX',     color: 'text-zinc-100',    bg: 'bg-zinc-500/20 ring-zinc-100/30' },
+  Binance: { label: 'Binance', color: 'text-yellow-400',  bg: 'bg-yellow-500/10 ring-yellow-500/30' },
 };
 
 /**
@@ -39,6 +40,8 @@ function buildTVSymbol(cleanSymbol: string, exchange: string): string {
       return `BITGET:${base}USDT.P`;
     case 'OKX':
       return `OKX:${base}USDT.P`;
+    case 'Binance':
+      return `BINANCE:${base}USDT.P`;
     default:
       return `BINGX:${base}USDT.P`;
   }

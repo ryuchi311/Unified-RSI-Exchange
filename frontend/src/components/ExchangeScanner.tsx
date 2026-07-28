@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDashboardStore } from '../hooks/useDashboardStore.js';
 import type { Exchange } from '../types/alerts.js';
 
-const EXCHANGES: Exchange[] = ['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX'];
+const EXCHANGES: Exchange[] = ['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX', 'Binance'];
 
 interface ExchangeStatus {
   exchange: Exchange;
@@ -71,6 +71,16 @@ const THEME = {
     btn: 'from-zinc-500 to-zinc-400',
     glow: 'shadow-zinc-500/10',
     dot: 'bg-zinc-100',
+  },
+  Binance: {
+    accent: 'text-yellow-400',
+    border: 'border-yellow-500/20 hover:border-yellow-500/40',
+    headerBg: 'from-yellow-500/10 via-transparent to-transparent',
+    badge: 'bg-yellow-500/10 text-yellow-400 ring-yellow-500/30',
+    progress: 'from-yellow-400 to-orange-400',
+    btn: 'from-yellow-500 to-yellow-600',
+    glow: 'shadow-yellow-500/10',
+    dot: 'bg-yellow-400',
   },
 };
 

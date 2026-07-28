@@ -12,6 +12,7 @@ export const Header: React.FC = () => {
     { name: 'Bitunix', dot: 'bg-emerald-400', ring: 'ring-emerald-500/30', text: 'text-emerald-300', bg: 'bg-emerald-500/10' },
     { name: 'Bitget', dot: 'bg-blue-400', ring: 'ring-blue-500/30', text: 'text-blue-300', bg: 'bg-blue-500/10' },
     { name: 'OKX', dot: 'bg-zinc-100', ring: 'ring-zinc-100/30', text: 'text-zinc-100', bg: 'bg-zinc-500/20' },
+    { name: 'Binance', dot: 'bg-yellow-400', ring: 'ring-yellow-500/30', text: 'text-yellow-300', bg: 'bg-yellow-500/10' },
   ] as const;
 
   const [status, setStatus] = React.useState<any[]>([]);
