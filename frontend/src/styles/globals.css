@@ -113,6 +113,7 @@ a {
   background: linear-gradient(135deg, #fbbf24 0%, #f97316 25%, #ef4444 50%, #eab308 75%, #fbbf24 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: gradient-shift 3s ease infinite, tamago-glow 2s ease-in-out infinite;
 }
