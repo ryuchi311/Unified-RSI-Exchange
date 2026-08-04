@@ -55,7 +55,7 @@ const loadVisibleExchanges = (): Set<Exchange> => {
   } catch (e) {
     // ignore
   }
-  return new Set(['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX', 'Binance']);
+  return new Set(['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX', 'Binance', 'LBank']);
 };
 
 const saveVisibleExchanges = (exchanges: Set<Exchange>) => {
@@ -138,17 +138,29 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     set({ visibleExchanges: visible });
   },
 
-  startAllScanning: () =>
+  startAllScanning: () => {
+    const allExchanges: Exchange[] = ['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX', 'Binance', 'LBank'];
+    allExchanges.forEach(ex => {
+      fetch(`http://localhost:5005/api/scan/${ex}/start`, { method: 'POST' })
+        .catch(err => console.error(`Failed to start scan for ${ex}:`, err));
+    });
     set({
-      scanningExchanges: new Set(['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX', 'Binance']),
+      scanningExchanges: new Set(allExchanges),
       isScanning: true,
-    }),
+    });
+  },
 
-  stopAllScanning: () =>
+  stopAllScanning: () => {
+    const allExchanges: Exchange[] = ['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX', 'Binance', 'LBank'];
+    allExchanges.forEach(ex => {
+      fetch(`http://localhost:5005/api/scan/${ex}/stop`, { method: 'POST' })
+        .catch(err => console.error(`Failed to stop scan for ${ex}:`, err));
+    });
     set({
       scanningExchanges: new Set(),
       isScanning: false,
-    }),
+    });
+  },
 
   setSymbolSearch: (search: string) => set({ symbolSearch: search }),
 

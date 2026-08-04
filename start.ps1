@@ -53,12 +53,18 @@ Write-Host "`n========================================" -ForegroundColor Cyan
 Write-Host "   Starting Servers..." -ForegroundColor Cyan
 Write-Host "========================================`n" -ForegroundColor Cyan
 
-Write-Host "[INFO] Backend will start on http://localhost:5005" -ForegroundColor Cyan
+Write-Host "[INFO] Main Backend will start on http://localhost:5005" -ForegroundColor Cyan
+Write-Host "[INFO] LBank Backend will start on http://localhost:5006" -ForegroundColor Cyan
 Write-Host "[INFO] Frontend will start on http://localhost:5175" -ForegroundColor Cyan
-Write-Host "`nStarting backend server..." -ForegroundColor Yellow
+Write-Host "`nStarting main backend server..." -ForegroundColor Yellow
 
-# Start backend in new PowerShell window
+# Start main backend in new PowerShell window
 Start-Process -FilePath "pwsh" -ArgumentList "-Command", "Set-Location '$PWD\backend'; npm run dev" -WindowStyle Normal -PassThru
+
+Write-Host "Starting LBank micro-backend server..." -ForegroundColor Yellow
+
+# Start LBank micro-backend in new PowerShell window
+Start-Process -FilePath "pwsh" -ArgumentList "-Command", "Set-Location '$PWD\backend'; npm run dev:lbank" -WindowStyle Normal -PassThru
 
 Start-Sleep -Seconds 3
 
@@ -68,9 +74,10 @@ Write-Host "Starting frontend server..." -ForegroundColor Yellow
 Start-Process -FilePath "pwsh" -ArgumentList "-Command", "Set-Location '$PWD\frontend'; npm run dev" -WindowStyle Normal -PassThru
 
 Write-Host "`n========================================" -ForegroundColor Green
-Write-Host "[✓] Both servers started!" -ForegroundColor Green
+Write-Host "[✓] All servers started!" -ForegroundColor Green
 Write-Host "========================================`n" -ForegroundColor Green
 
-Write-Host "Frontend:  http://localhost:5175" -ForegroundColor Cyan
-Write-Host "Backend:   http://localhost:5005" -ForegroundColor Cyan
+Write-Host "Frontend:       http://localhost:5175" -ForegroundColor Cyan
+Write-Host "Main Backend:   http://localhost:5005" -ForegroundColor Cyan
+Write-Host "LBank Backend:  http://localhost:5006" -ForegroundColor Cyan
 Write-Host "`nPress Ctrl+C in each window to stop servers`n" -ForegroundColor Yellow

@@ -185,6 +185,7 @@ export const SettingsPanel: React.FC = () => {
                 <option value="Bitget">Bitget Perpetual</option>
                 <option value="OKX">OKX Perpetual</option>
                 <option value="Binance">Binance Perpetual</option>
+                <option value="LBank">LBank Perpetual</option>
               </select>
             </div>
           </section>

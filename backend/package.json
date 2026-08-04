@@ -6,8 +6,10 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "dev:lbank": "tsx watch src/lbank_index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "start:lbank": "node dist/lbank_index.js",
     "test": "vitest"
   },
   "keywords": [],

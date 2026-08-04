@@ -14,6 +14,13 @@ export class SymbolManager {
   }
 
   /**
+   * Get all registered exchange names
+   */
+  getRegisteredExchanges(): Exchange[] {
+    return Array.from(this.exchanges.keys());
+  }
+
+  /**
    * Initialize symbol cache from all exchanges
    */
   async initialize(): Promise<void> {

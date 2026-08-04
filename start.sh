@@ -48,37 +48,47 @@ echo "=========================================="
 echo "   Starting Servers..."
 echo "=========================================="
 echo ""
-echo "[INFO] Backend will start on http://localhost:5005"
+echo "[INFO] Main Backend will start on http://localhost:5005"
+echo "[INFO] LBank Backend will start on http://localhost:5006"
 echo "[INFO] Frontend will start on http://localhost:5175"
 echo ""
 
-# Start backend in background
-echo "Starting backend server..."
+# Start main backend in background
+echo "Starting main backend server..."
 cd backend
 npm run dev &
 BACKEND_PID=$!
+cd ..
+
+# Start LBank micro-backend in background
+echo "Starting LBank micro-backend server..."
+cd backend
+npm run dev:lbank &
+LBANK_PID=$!
 cd ..
 
 sleep 3
 
 # Start frontend in background
 echo "Starting frontend server..."
-cd frontend
+cd backend
+cd ../frontend
 npm run dev &
 FRONTEND_PID=$!
 cd ..
 
 echo ""
 echo "=========================================="
-echo "[✓] Both servers started!"
+echo "[✓] All servers started!"
 echo "=========================================="
 echo ""
-echo "Frontend:  http://localhost:5175"
-echo "Backend:   http://localhost:5005"
+echo "Frontend:       http://localhost:5175"
+echo "Main Backend:   http://localhost:5005"
+echo "LBank Backend:  http://localhost:5006"
 echo ""
-echo "Press Ctrl+C to stop both servers"
+echo "Press Ctrl+C to stop all servers"
 echo ""
 
 # Wait for interrupt
-trap "kill $BACKEND_PID $FRONTEND_PID; exit" INT
+trap "kill $BACKEND_PID $LBANK_PID $FRONTEND_PID; exit" INT
 wait

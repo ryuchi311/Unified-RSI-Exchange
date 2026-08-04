@@ -19,7 +19,7 @@ export function registerAlertRoutes(
 ): void {
   // Get dashboard summary (scan status + stats)
   app.get('/api/status/dashboard', (req, res) => {
-    const exchanges: Exchange[] = ['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX', 'Binance'];
+    const exchanges: Exchange[] = symbolManager.getRegisteredExchanges();
     const status = exchanges.map(exchange => {
       const progress = restPoller?.getScanProgress(exchange) ?? { scanned: 0, total: 0 };
       return {
@@ -90,7 +90,7 @@ export function registerAlertRoutes(
   });
 
   app.get('/api/scan/status', (req, res) => {
-    const exchanges: Exchange[] = ['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX', 'Binance'];
+    const exchanges: Exchange[] = symbolManager.getRegisteredExchanges();
     const status = exchanges.reduce((acc, ex) => {
       acc[ex] = restPoller?.isScanning(ex) ?? false;
       return acc;

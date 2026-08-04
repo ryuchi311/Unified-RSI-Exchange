@@ -56,7 +56,7 @@ export function useAlerts() {
       ws.onmessage = (event) => {
         try {
           const alert = JSON.parse(event.data);
-          console.log('[WS] Alert received:', alert.symbol, alert.alertType);
+          console.log('[WS] Alert received:', alert.symbol, alert.exchange, alert.alertType);
           addAlert(alert);
           
           // Play audio alert if enabled

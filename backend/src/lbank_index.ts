@@ -1,10 +1,4 @@
 import dotenv from 'dotenv';
-import { BingXService } from './services/BingXService.js';
-import { MEXCService } from './services/MEXCService.js';
-import { BitunixService } from './services/BitunixService.js';
-import { BitgetService } from './services/BitgetService.js';
-import { OKXService } from './services/OKXService.js';
-import { BinanceService } from './services/BinanceService.js';
 import { LBankService } from './services/LBankService.js';
 import { SymbolManager } from './services/SymbolManager.js';
 import { WebSocketManager } from './websocket/manager.js';
@@ -19,12 +13,12 @@ import { DiscordService } from './services/DiscordService.js';
 
 dotenv.config();
 
-const PORT = parseInt(process.env.PORT || '5005', 10);
+const PORT = parseInt(process.env.LBANK_PORT || '5006', 10);
 const SYMBOL_REFRESH_INTERVAL = parseInt(process.env.SYMBOL_REFRESH_INTERVAL || '3600000', 10);
 const ALERT_DEDUP_WINDOW = parseInt(process.env.ALERT_DEDUP_WINDOW || '300000', 10);
 
 async function main() {
-  logger.info('Starting RSI Scanner Backend...');
+  logger.info('Starting Isolated LBank RSI Scanner Micro-Backend...');
 
   // Initialize Settings
   const settingsManager = new SettingsManager();
@@ -32,14 +26,8 @@ async function main() {
   const telegramService = new TelegramService(settingsManager);
   const discordService = new DiscordService(settingsManager);
 
-  // Initialize exchange services (all 7 exchanges handled natively)
+  // Initialize LBank exchange service exclusively
   const exchanges = new Map<Exchange, any>([
-    ['BingX', new BingXService()],
-    ['MEXC', new MEXCService()],
-    ['Bitunix', new BitunixService()],
-    ['Bitget', new BitgetService()],
-    ['OKX', new OKXService()],
-    ['Binance', new BinanceService()],
     ['LBank', new LBankService()],
   ]);
 
@@ -51,39 +39,28 @@ async function main() {
   const apiServer = new APIServer(alertDetector, symbolManager, wsManager, restPoller, settingsManager);
 
   try {
-    // Initialize symbol cache
+    // Initialize symbol cache for LBank
     await symbolManager.initialize();
 
-    // Start WebSocket connections (optional, skips exchanges with null WS URL)
-    logger.info('Connecting to exchange WebSockets...');
-    for (const [exchange] of exchanges) {
-      await wsManager.connect(exchange);
-    }
+    // Start REST polling scanner for LBank
+    logger.info('Starting LBank REST polling scanner...');
+    restPoller.start('LBank');
 
-    // Start REST polling for RSI scanning across all perpetual futures exchanges
-    logger.info('Starting REST polling scanner...');
-    const pollableExchanges: Exchange[] = ['BingX', 'MEXC', 'Bitunix', 'Bitget', 'OKX', 'Binance', 'LBank'];
-    for (const exchange of pollableExchanges) {
-      restPoller.start(exchange);
-    }
+    // Start auto-refresh for LBank symbols
+    symbolManager.startAutoRefresh('LBank');
 
-    // Start auto-refresh for symbols
-    for (const [exchange] of exchanges) {
-      symbolManager.startAutoRefresh(exchange);
-    }
-
-    // Start API server
+    // Start API server on LBank port (5006)
     apiServer.start(PORT);
 
-    logger.info('RSI Scanner Backend started successfully');
+    logger.info(`LBank Scanner Backend started successfully on port ${PORT}`);
   } catch (error) {
-    logger.error('Failed to start server', error);
+    logger.error('Failed to start LBank micro-backend server', error);
     process.exit(1);
   }
 
   // Graceful shutdown
   process.on('SIGINT', () => {
-    logger.info('Shutting down...');
+    logger.info('Shutting down LBank micro-backend...');
     restPoller.stopAll();
     apiServer.stop();
     process.exit(0);
